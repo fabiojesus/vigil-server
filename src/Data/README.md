@@ -1,8 +1,8 @@
 # Data Folder
 This folder contains the Entities representation through a set of schemas that are used by mongoose.
-These are also replicated on graphQL as it is a strongly typed language
+These are also replicated on graphQL as it is a strongly typed language.
 
-##Structure
+## Structure
 The data structure is according to the following schematic
 
 *Account
