@@ -6,6 +6,9 @@ const app = express();
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(bodyParser.json());
 
+
+const Account = require("./src/DataAccess/Accounts/Account");
+
 app.use((req, res, next) => {
   res.setHeader("X-Powered-By", "Vigil");
   next();

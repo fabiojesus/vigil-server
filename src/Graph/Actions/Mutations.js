@@ -3,7 +3,6 @@ const Examinee = require('../../DataAccess/Examinees/Examinee');
 const ExamineeRecord = require('../../DataAccess/Examinees/Record');
 const Examiner = require('../../DataAccess/Examiners/Examiner');
 const ExaminerRecord = require('../../DataAccess/Examiners/Record');
-const jsonwebtoken = require("jsonwebtoken");
 const msg = require('../../Config/messages');
 const Room = require('../../DataAccess/Rooms/Room');
 const RoomRecord = require('../../DataAccess/Rooms/Record')
@@ -11,23 +10,17 @@ const Subject = require("../../DataAccess/Subjects/Subject");
 const SubjectRecord = require("../../DataAccess/Subjects/Record");
 const SubjectTest = require('../../DataAccess/Subjects/Test');
 const Test = require('../../DataAccess/Tests/Test');
-const TestExaminee = require('../../DataAccess/Tests/Examinee');
-const TestExaminer = require('../../DataAccess/Tests/Examiner');
-const TestRoom = require('../../DataAccess/Tests/Examinee');
 const Token = require('../../DataAccess/Accounts/Token');
 const utils = require('./ActionUtils');
 
+/**
+ * logins the user, checking if the input data is correct and if the user is logged in already
+ * @param {string} email 
+ * @param {string} password 
+ */
 function login(email, password){
     return new Promise(function(resolve, reject){
-        Account.search(email).then(function(account){
-            account = account.content;
-            if(!account) resolve({code: msg.ACCOUNT_NOT_EXISTS})
-            if(account.password == password){
-                var tokenValue = jsonwebtoken.sign({id:account._id, email:account.email, role:account.role}, "TUNACANCANTUCAN", {expiresIn:'1d'});
-                Token.create(tokenValue).then(resolve({code:msg.LOGIN_SUCCESSFUL, token:tokenValue})).catch(function(res){resolve(res)})
-            }
-            else resolve({code:msg.ACCOUNT_NOT_EXISTS});
-        }).catch(function(err){resolve(err)});
+        utils.validateAccount(email, password).then(function(res){resolve(res)});
     });
 }
 

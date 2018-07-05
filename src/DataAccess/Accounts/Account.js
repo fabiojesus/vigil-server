@@ -2,7 +2,11 @@ const Account = require('../../Data/Account').Account;
 const msg = require('../../Config/messages');
 
 /**
- * Creates a new account record returning a {code, content} result
+ * Registers a new account
+ * @param {string} email 
+ * @param {string} password 
+ * @param {string} profileId 
+ * @param {string} role 
  */
 function create(email, password, profileId, role){
     return new Promise(function(resolve, reject){
@@ -16,6 +20,10 @@ function create(email, password, profileId, role){
     });
 }
 
+/**
+ * Searches an account through it's email address
+ * @param {string} email 
+ */
 function search(email){
     return new Promise(function(resolve, reject){
         Account.find({email:email}).then(function(accounts){
@@ -24,8 +32,10 @@ function search(email){
         });
     })
 }
+
 /**
- * Searches for an account record returning a {code, content} result that may contain the record
+ * Returns a account object based on it's id
+ * @param {string} id 
  */
 function get(id){
     return new Promise(function(resolve, reject){
@@ -37,7 +47,11 @@ function get(id){
 }
 
 /**
- *  Updates an existing Account Record returning a {code, content} result
+ * Updates an account data
+ * @param {*} id 
+ * @param {*} email 
+ * @param {*} password 
+ * @param {*} role 
  */
 function update(id, email, password, role){
     return new Promise(function(resolve, reject){
@@ -59,7 +73,8 @@ function update(id, email, password, role){
 }
 
 /**
- *  Activates / Deactivates an existing Account Record returning a {code, content} result
+ * Activates / deactivates an account
+ * @param {string} id 
  */
 function toggle(id){
     return new Promise(function(resolve, reject){
@@ -85,7 +100,7 @@ function toggle(id){
 }
 
 /**
- * Searches for all Account Records returning a {code, content} result that may include the accounts' list
+ * Lists all the accounts
  */
 function list(){
     return new Promise(function(resolve, reject){

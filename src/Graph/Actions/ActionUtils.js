@@ -1,5 +1,7 @@
 const Token = require('../../DataAccess/Accounts/Token');
 const decode = require('jwt-decode');
+const jsonwebtoken = require("jsonwebtoken");
+const Account = require('../../DataAccess/Accounts/Account');
 
 function sendEmail(email, content){
     var nodemailer = require('nodemailer');
@@ -73,8 +75,22 @@ function isExaminee(token){
     return decoded.role == "examinee";
 }
 
-function createToken(){
+function createToken(account){
+   return jsonwebtoken.sign({id:account._id, email:account.email, role:account.role}, "TUNACANCANTUCAN", {expiresIn:'1d'});
+}
 
+function validateAccount(email, password){
+    return new Promise(function(resolve, reject){
+        Account.search(email).then(function(account){
+            account = account.content;
+            if(!account) resolve({code: msg.ACCOUNT_NOT_EXISTS})
+            if(account.password == password){
+                var tokenValue = createToken(account);
+                Token.create(tokenValue).then(resolve({code:msg.LOGIN_SUCCESSFUL, token:tokenValue})).catch(function(res){resolve(res)})
+            }
+            else resolve({code:msg.ACCOUNT_NOT_EXISTS});
+        }).catch(function(err){resolve(err)});
+    });
 }
 
 module.exports ={
@@ -85,5 +101,6 @@ module.exports ={
     isAdmin,
     isExaminee,
     isExaminer,
-    createToken
+    createToken,
+    validateAccount
 }   

@@ -5,7 +5,7 @@ const AccountSchema = new Schema({
     profileId: String,
     email:String,
     password:String,
-    role:String,
+    role:Integer,
     active:Boolean
 });
 
