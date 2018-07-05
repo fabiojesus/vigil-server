@@ -99,6 +99,22 @@ function toggle(examinerId, recordId){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Examiner.findById(id).then(function(examiner){
+            if(!examiner) reject({code:msg.EXAMINER_NOT_EXISTS})
+            else{
+                var record = examiner.records.id(recordId);
+                if(!record) reject({code: msg.EXAMINER_RECORD_NOT_EXIST});
+                else{
+                    record.active = false;
+                    examiner.save(function(){resolve({code:msg.EXAMINER_RECORD_DELETED, content:record._id})});
+                }
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for examiner's records returning a {code, content} result that may include the Records' list
  */
@@ -111,4 +127,4 @@ function list(examinerId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

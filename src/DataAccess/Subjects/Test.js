@@ -109,6 +109,26 @@ function toggle(subjectId, recordId, testId){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Subject.findById(id).then(function(subject){
+            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
+            else{
+                var record = subject.records.id(recordId);
+                if(!record) reject({code: msg.SUBJECT_RECORD_NOT_EXIST});
+                else{
+                    var test = record.tests.id(testId);
+                    if(!test) reject({code:msg.SUBJECT_TEST_NOT_EXISTS});
+                    else{
+                        test.active = false;
+                        resolve({code:msg.SUBJECT_TEST_DELETED, content:test._id})
+                    }
+                }
+            }
+        })
+    });
+}
+
 /**
  * Searches for subject's tests returning a {code, content} result that may include the tests' list
  */
@@ -123,4 +143,4 @@ function list(subjectId, recordId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

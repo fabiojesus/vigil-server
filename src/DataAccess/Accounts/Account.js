@@ -99,6 +99,18 @@ function toggle(id){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Account.findById(id).then(function(account){
+            if(!account) reject({code:msg.ACCOUNT_NOT_EXISTS})
+            else{
+                account.active = false;
+                account.save(function(){resolve({code:msg.ACCOUNT_DELETED, content:account._id})});   
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Lists all the accounts
  */
@@ -110,4 +122,4 @@ function list(){
     });
 }
 
-module.exports = {create, get, search, update, toggle, list};
+module.exports = {create, get, search, update, toggle, erase, list};

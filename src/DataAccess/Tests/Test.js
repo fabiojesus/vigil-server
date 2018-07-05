@@ -84,6 +84,18 @@ function toggle(id){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Test.findById(id).then(function(test){
+            if(!test) reject({code:msg.SUBJECT_NOT_EXISTS})
+            else{
+                test.active = false;
+                test.save(function(){resolve({code:msg.SUBJECT_DELETED, content:test._id})});
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for all Test Records returning a {code, content} result that may include the tests' list
  */
@@ -97,4 +109,4 @@ function list(){
     });
 }
 
-module.exports = {create, get, update, toggle, list};
+module.exports = {create, get, update, toggle, erase, list};

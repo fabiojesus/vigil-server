@@ -76,6 +76,18 @@ function toggle(id){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Room.findById(id).then(function(room){
+            if(!room) reject({code:msg.ROOM_NOT_EXISTS})
+            else{
+                room.active = false;
+                room.save(function(){resolve({code:msg.ROOM_DELETED, content:room._id})})
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for all Room Records returning a {code, content} result that may include the rooms' list
  */
@@ -87,4 +99,4 @@ function list(){
     });
 }
 
-module.exports = {create, get, update, toggle, list};
+module.exports = {create, get, update, toggle, erase, list};

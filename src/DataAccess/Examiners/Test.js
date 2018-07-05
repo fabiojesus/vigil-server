@@ -109,6 +109,26 @@ function toggle(examinerId, recordId, testId){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Examiner.findById(id).then(function(examiner){
+            if(!examiner) reject({code:msg.EXAMINER_NOT_EXISTS})
+            else{
+                var record = examiner.records.id(recordId);
+                if(!record) reject({code: msg.EXAMINER_RECORD_NOT_EXIST});
+                else{
+                    var test = record.tests.id(testId);
+                    if(!test) reject({code:msg.EXAMINER_TEST_NOT_EXISTS});
+                    else{
+                        test.active = false;
+                        examiner.save(function(){resolve({code:msg.EXAMINER_TEST_DELETED, content:test._id})})
+                    }
+                }
+            }
+        })
+    });
+}
+
 /**
  * Searches for examiner's tests returning a {code, content} result that may include the tests' list
  */
@@ -123,4 +143,4 @@ function list(examinerId, recordId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

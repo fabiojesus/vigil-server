@@ -110,6 +110,26 @@ function toggle(roomId, recordId, testId){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Room.findById(id).then(function(room){
+            if(!room) reject({code:msg.ROOM_NOT_EXISTS})
+            else{
+                var record = room.records.id(recordId);
+                if(!record) reject({code: msg.ROOM_RECORD_NOT_EXIST});
+                else{
+                    var test = record.tests.id(testId);
+                    if(!test) reject({code:msg.ROOM_TEST_NOT_EXISTS});
+                    else{
+                        test.active = false;
+                        room.save(function(){resolve({code:msg.ROOM_TEST_DELETED, content:test._id})});
+                    }
+                }
+            }
+        })
+    });
+}
+
 /**
  * Searches for room's tests returning a {code, content} result that may include the tests' list
  */
@@ -124,4 +144,4 @@ function list(roomId, recordId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

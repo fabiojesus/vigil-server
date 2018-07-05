@@ -99,6 +99,22 @@ function toggle(subjectId, recordId){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Subject.findById(id).then(function(subject){
+            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
+            else{
+                var record = subject.records.id(recordId);
+                if(!record) reject({code: msg.SUBJECT_RECORD_NOT_EXIST});
+                else{
+                    record.active = false;
+                    subject.save(function(){resolve({code:msg.SUBJECT_RECORD_DELETED, content:record._id})});
+                }
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for subject's records returning a {code, content} result that may include the Records' list
  */
@@ -111,4 +127,4 @@ function list(subjectId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

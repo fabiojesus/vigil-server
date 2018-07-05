@@ -99,6 +99,22 @@ function toggle(testId, roomId){
     });
 }
 
+function erase(testId, roomId){
+    return new Promise(function(resolve, reject){
+        Test.findById(testId).then(function(test){
+            if(!test)reject({code:msg.TEST_NOT_EXISTS});
+            else{
+                var room = test.rooms.id(roomId);
+                if(!room) reject({code: msg.TEST_ROOM_NOT_EXIST});
+                else{
+                    room.active=false;
+                    test.save(function(){resolve({code:msg.TEST_ROOM_DELETED, content:test._id})})
+                }
+            }
+        });
+    });
+}
+
 /**
  * Searches for test's rooms returning a {code, content} result that may include the Rooms' list
  */
@@ -111,4 +127,4 @@ function list(testId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

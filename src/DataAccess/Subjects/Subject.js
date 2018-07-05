@@ -76,6 +76,18 @@ function toggle(id){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Subject.findById(id).then(function(subject){
+            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
+            else{
+                subject.active = false;
+                subject.save(function(){resolve({code:msg.SUBJECT_DELETED, content:subject._id})});
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for all Subject Records returning a {code, content} result that may include the subjects' list
  */
@@ -87,4 +99,4 @@ function list(){
     });
 }
 
-module.exports = {create, get, update, toggle, list};
+module.exports = {create, get, update, toggle, erase, list};

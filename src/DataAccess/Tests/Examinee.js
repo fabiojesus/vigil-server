@@ -104,6 +104,22 @@ function toggle(testId, examineeId){
     });
 }
 
+function erase(testId, examineeId){
+    return new Promise(function(resolve, reject){
+        Test.findById(testId).then(function(test){
+            if(!test)reject({code:msg.TEST_NOT_EXISTS});
+            else{
+                var examinee = test.examinee.id(examineeId);
+                if(!examinee) reject({code: msg.TEST_EXAMINEE_NOT_EXIST});
+                else{
+                    examinee.active=false;
+                    test.save(function(){resolve({code:msg.TEST_EXAMINEE_DELETED, content:examinee._id})})
+                }
+            }
+        });
+    });
+}
+
 /**
  * Searches for test's examinees returning a {code, content} result that may include the Examinees' list
  */
@@ -116,4 +132,4 @@ function list(testId){
     })
 }
 
-module.exports = {create, get, update, toggle, list}
+module.exports = {create, get, update, toggle, erase, list}

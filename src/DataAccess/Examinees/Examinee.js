@@ -76,6 +76,18 @@ function toggle(id){
     });
 }
 
+function erase(id){
+    return new Promise(function(resolve, reject){
+        Examinee.findById(id).then(function(examinee){
+            if(!examinee) reject({code:msg.EXAMINEE_NOT_EXISTS})
+            else{
+                examinee.active = false;
+                examinee.save(function(){resolve({code:msg.EXAMINEE_DELETED, content:examinee._id})});    
+            }
+        }).catch(function(res){reject(res)})
+    });
+}
+
 /**
  * Searches for all Examinee Records returning a {code, content} result that may include the examinees' list
  */
@@ -87,4 +99,4 @@ function list(){
     });
 }
 
-module.exports = {create, get, update, toggle, list};
+module.exports = {create, get, update, toggle, erase, list};
