@@ -6,7 +6,7 @@ These are also replicated on graphQL as it is a strongly typed language
 The data structure is according to the following schematic
 
 * Account
-..* sd
+** sd
 
 |-- Account
 |       |----- ProfileId - the user's profile being that administrators have none
