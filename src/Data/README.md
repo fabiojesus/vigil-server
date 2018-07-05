@@ -5,15 +5,15 @@ These are also replicated on graphQL as it is a strongly typed language.
 ## Structure
 The data structure is according to the following schematic
 
-### Account
+#### Account
 * ProfileId - the user's profile being that administrators have none
 * Email - the user's email account
 * Password - the user's password
 * Role - the users role
 * Active - wheter the user account is activated or not
-### Token
+#### Token
 * Token - the token value
-### Examinee
+#### Examinee
 * name - the examinee's name
 * identification - the examinee's identification (civil identification number)
 * active - whether the examinee's record is active or not
@@ -25,7 +25,7 @@ The data structure is according to the following schematic
   * tests - a set of test records
     * testId - the test's id
     * active - wheter the test's record is active or not
-### Examiner
+#### Examiner
 * name - the examiner's name
 * identification - the examiner's identification (civil identification number)
 * active - whether the examiner's record is active or not
@@ -35,7 +35,7 @@ The data structure is according to the following schematic
   * tests - a set of test records
     * testId - the test's id
     * active - wheter the test's record is active or not
-### Room
+#### Room
 * name - the room's name
 * seats - the ammount of seats in a room
 * active - whether the room's reord is active or not
@@ -45,7 +45,7 @@ The data structure is according to the following schematic
   * tests - a set of test records
     * testId - the test's id
     * active - wheter the test's record is active or not
-### Subject
+#### Subject
 * name - the subjects's name
 * field - the subject's field
 * active - whether the room's reord is active or not
@@ -55,7 +55,7 @@ The data structure is according to the following schematic
   * tests - a set of test records
     * testId - the test's id
     * active - wheter the test's record is active or not
-### Test
+#### Test
 * year - the year when the test is being taken
 * confirmationDate - the confirmation date limit
 * dateStart - when the test starts
