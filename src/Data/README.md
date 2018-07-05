@@ -5,6 +5,9 @@ These are also replicated on graphQL as it is a strongly typed language
 ##Structure
 The data structure is according to the following schematic
 
+*Account
+..*sd
+
 |-- Account
 |       |----- ProfileId - the user's profile being that administrators have none
 |       |----- Email - the user's email account
@@ -16,8 +19,11 @@ The data structure is according to the following schematic
 |       |----- Token - the token value
 |
 |-- Examinee 
-|       |----- 
-|
+|       |----- name - the examinee's name
+|       |----- identification - the examinee's identification (civil identification number)
+|       |----- active - whether the examinee's record is active or not
+|       |----- records: year record set
+|                  |-------
 |
 Examiner
 Room
