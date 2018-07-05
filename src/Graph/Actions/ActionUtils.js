@@ -2,6 +2,7 @@ const Token = require('../../DataAccess/Accounts/Token');
 const decode = require('jwt-decode');
 const jsonwebtoken = require("jsonwebtoken");
 const Account = require('../../DataAccess/Accounts/Account');
+const msg = require('../../Config/messages');
 
 function sendEmail(email, content){
     var nodemailer = require('nodemailer');
