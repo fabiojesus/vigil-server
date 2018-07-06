@@ -44,5 +44,5 @@ Updating records is a troublesome act that may cause further consistency problem
 * update records - no change allowed except on examinee's that allow to change the student number and course name (__TODO__)
 * update test - no change (__TODO__)
 * all toggles and erases are allowed, however it reflects on the lower levels:
-** can't delete rooms with examiners (__TODO__)
-** deleting examiners and examinees from a test requires removing the test from the examiner/examinee record. (__TODO__)
+  * can't delete rooms with examiners (__TODO__)
+  * deleting examiners and examinees from a test requires removing the test from the examiner/examinee record. (__TODO__)
