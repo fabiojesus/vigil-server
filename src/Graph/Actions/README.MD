@@ -31,7 +31,7 @@ Mutations are the hardest part to handle due to restrictions on data manipulatio
 * assign examinee to test - sets an examinee to a room and a seat on a test (__TODO__) (bound to adminstration)
 * assign examiner to test - sets an examiner to a room on a test (__TODO__) (bound to administration)
 * assign room to test - sets a room on a test (__TODO__) (bound to administration)
-* register examinee to test - set the examinee's registered field to true (bound to examinee) (__TODO_)
+* register examinee to test - set the examinee's registered field to true (bound to examinee) (__TODO__)
 * register examinee presence - sets the examinee's presence to a value composed by it's identification, the examiner's identification and the sheet's number. (bound to the examiner) (__TODO__)
 
 Updating records is a troublesome act that may cause further consistency problems. Due to that all changes on tests must reflect on it's dependee's and so on. In order to keep a record of what happens, there are two deletion options. Toggle, that allows the adminstration to roll back the value as long as it has not been repeated and erase that won't allow rollback. All of the mutations have a prevention methodology implemented that defines what the unique values for each entity should be to avoid repetion. These are properties that are indistinguishable from each other such as a room name or a student's identification number.  The updating mutations are as followed:
@@ -46,3 +46,6 @@ Updating records is a troublesome act that may cause further consistency problem
 * all toggles and erases are allowed, however it reflects on the lower levels:
   * can't delete rooms with examiners (__TODO__)
   * deleting examiners and examinees from a test requires removing the test from the examiner/examinee record. (__TODO__)
+
+## Action Utilitaries
+Auxiliary functions to send emails and validate accounts. Since the token goes back and forward with the queries, it's easier to set them up here.
