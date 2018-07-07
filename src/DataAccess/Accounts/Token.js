@@ -8,11 +8,9 @@ const msg = require('../../Config/messages');
 function create(tokenValue){
     return new Promise(function(resolve, reject){
         Token.find({token:tokenValue}).then(function(tokens){
-            if(tokens.length>0) reject({code:msg.TOKEN_EXISTS});
-            else{
-                var token = new Token({token:tokenValue});
-                token.save(function(){resolve({code:msg.TOKEN_REGISTER, content:token.token})});
-            }
+            if(tokens.length>0){ reject({code:msg.TOKEN_EXISTS}); return; }
+            var token = new Token({token:tokenValue});
+            token.save(function(){resolve({code:msg.TOKEN_REGISTER, content:token.token})});
         })
     });
 }
@@ -24,8 +22,8 @@ function create(tokenValue){
 function get(id){
     return new Promise(function(resolve, reject){
         Token.findById(id).then(function(token){
-            if(!token) reject({code:msg.TOKEN_NOT_EXISTS});
-            else resolve({code:msg.TOKEN_FETCH, content:account});
+            if(!token){reject({code:msg.TOKEN_NOT_EXISTS}); return;}
+            resolve({code:msg.TOKEN_FETCH, content:account});
         });
     });
 }
@@ -47,7 +45,7 @@ function erase(tokenValue){
 function search(tokenValue){
     return new Promise(function(resolve, reject){
         Token.find({token:tokenValue}).then(function(tokens){
-            if(tokens.length == 0) reject({code:msg.TOKEN_NOT_EXISTS});
+            if(tokens.length == 0){ reject({code:msg.TOKEN_NOT_EXISTS}); return;}
             resolve({code: msg.TOKEN_FETCH, content:tokens[0]});
         });
     })
@@ -57,10 +55,8 @@ function search(tokenValue){
  * Lists all tokens
  */
 function list(){
-    return new Promise(function(resolve, reject){
-        Token.find({}).then(function(result){
-            resolve({code: msg.TOKENS_FETCH, content:result});
-        })
+    return new Promise(function(resolve){
+        Token.find({}).then(function(result){resolve({code: msg.TOKENS_FETCH, content:result});})
     });
 }
 

@@ -10,21 +10,15 @@ const utils = require('../acessUtils');
 function create(examineeId, recordId, testId){
     return new Promise(function(resolve, reject){
         Examinee.findById(examineeId).then(function(examinee){
-            if(!examinee)reject({code:msg.EXAMINEE_NOT_EXISTS});
-            else{
-                var record = examinee.records.id(recordId);
-                if(!record) reject({code: msg.EXAMINEE_RECORD_NOT_EXISTS});
-                else{
-                    var tests = record.tests;
-                    var itemsLikeIt = tests.filter(function(currentItem){return utils.isTheSame(currentItem, {testId:testId, active:true})});
-                    if(itemsLikeIt.length > 0) reject({code:msg.EXAMINEE_TEST_EXISTS})
-                    else{
-                        var newTest = new Test({testId, active:true});
-                        record.tests.push(newTest);
-                        examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_REGISTER, content:newTest._id})});
-                    }
-                }
-            }
+            if(!examinee){reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}
+            var record = examinee.records.id(recordId);
+            if(!record) {reject({code: msg.EXAMINEE_RECORD_NOT_EXISTS}); return;}
+            var tests = record.tests;
+            var itemsLikeIt = tests.filter(function(currentItem){return utils.isTheSame(currentItem, {testId:testId, isDeleted:false})});
+            if(itemsLikeIt.length > 0) {reject({code:msg.EXAMINEE_TEST_EXISTS}); return;}
+            var newTest = new Test({testId, isDeleted:false});
+            record.tests.push(newTest);
+            examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_REGISTER, content:newTest._id})});
         })
     });
 }
@@ -35,16 +29,12 @@ function create(examineeId, recordId, testId){
 function get(examineeId, recordId, testId){
     return new Promise(function(resolve, reject){
         Examinee.findById(examineeId).then(function(examinee){
-            if(!examinee)reject({code:msg.EXAMINEE_NOT_EXISTS});
-            else{
-                var record = examinee.records.id(recordId);
-                if(!record) reject({code: msg.EXAMINEE_RECORD_NOT_EXIST});
-                else{
-                    var test = record.tests.id(testId);
-                    if(!test) reject({code:msg.EXAMINEE_TEST_NOT_EXISTS});
-                    else resolve({code:msg.EXAMINEE_TEST_FETCH, content:test});
-                }
-            }
+            if(!examinee){reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}
+            var record = examinee.records.id(recordId);
+            if(!record) {reject({code: msg.EXAMINEE_RECORD_NOT_EXIST}); return;}
+            var test = record.tests.id(testId);
+            if(!test) {reject({code:msg.EXAMINEE_TEST_NOT_EXISTS}); return;}
+            resolve({code:msg.EXAMINEE_TEST_FETCH, content:test});
         });
     });
 }
@@ -55,56 +45,16 @@ function get(examineeId, recordId, testId){
 function update(examineeId, recordId, testId, newTestId){
     return new Promise(function(resolve, reject){
         Examinee.findById(examineeId).then(function(examinee){
-            if(!examinee)reject({code:msg.EXAMINEE_NOT_EXISTS});
-            else{
-                var record = examinee.records.id(recordId);
-                if(!record) reject({code: msg.EXAMINEE_RECORD_NOT_EXISTS});
-                else{
-                    var test = record.tests.id(testId);
-                    if(!test) reject({code: msg.EXAMINEE_TEST_NOT_EXISTS});
-                    else{
-                        if(newTestId) test.testId = newTestId;
-                        var itemsLikeIt = record.tests.filter(function(currentItem){return utils.isTheSame(currentItem, {testId:test.testId, active:true})});
-                        itemsLikeIt= utils.removeSelf(itemsLikeIt, test);
-                        if(itemsLikeIt.length > 0) reject({code:msg.EXAMINEE_TEST_EXISTS})
-                        else{
-                            examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_UPDATED, content:record._id})})
-                        }    
-                    }
-                }
-            }
-        });
-    });
-}
-
-/**
- *  Activates / Deactivates an examinee's test returning a {code, content} result
- */
-function toggle(examineeId, recordId, testId){
-    return new Promise(function(resolve, reject){
-        Examinee.findById(examineeId).then(function(examinee){
-            if(!examinee)reject({code:msg.EXAMINEE_NOT_EXISTS});
+            if(!examinee){reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}
             var record = examinee.records.id(recordId);
-            if(!record) reject({code:msg.EXAMINEE_RECORD_NOT_EXISTS});
-            else{
-                var test = record.tests.id(testId);
-                if(!test) reject({code:msg.EXAMINEE_TEST_NOT_EXISTS});
-                else{
-                    if(test.active){
-                        test.active=false;
-                        examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_TOGGLED, content:examinee._id})})
-                    }
-                    else{
-                        var itemsLikeIt = record.tests.filter(function(currentItem){return utils.isTheSame(currentItem, {testId:test.testId, active:true})});
-                        itemsLikeIt= utils.removeSelf(itemsLikeIt, test);
-                        if(itemsLikeIt.length > 0) reject({code:msg.EXAMINEE_TEST_EXISTS})
-                        else{
-                            test.active=true;
-                            examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_TOGGLED, content:test._id})})
-                        }
-                    }
-                }
-            }
+            if(!record) {reject({code: msg.EXAMINEE_RECORD_NOT_EXISTS}); return;}
+            var test = record.tests.id(testId);
+            if(!test) {reject({code: msg.EXAMINEE_TEST_NOT_EXISTS}); return;}
+            if(newTestId) test.testId = newTestId;
+            var itemsLikeIt = record.tests.filter(function(currentItem){return utils.isTheSame(currentItem, {testId:test.testId, isDeleted:false})});
+            itemsLikeIt= utils.removeSelf(itemsLikeIt, test);
+            if(itemsLikeIt.length > 0) {reject({code:msg.EXAMINEE_TEST_EXISTS}); return;}
+            examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_UPDATED, content:record._id})})
         });
     });
 }
@@ -112,19 +62,13 @@ function toggle(examineeId, recordId, testId){
 function erase(id){
     return new Promise(function(resolve, reject){
         Examinee.findById(id).then(function(examinee){
-            if(!examinee) reject({code:msg.EXAMINEE_NOT_EXISTS})
-            else{
-                var record = examinee.records.id(recordId);
-                if(!record) reject({code: msg.EXAMINEE_RECORD_NOT_EXIST});
-                else{
-                    var test = record.tests.id(testId);
-                    if(!test) reject({code:msg.EXAMINEE_TEST_NOT_EXISTS});
-                    else{
-                        test.active = false;
-                        examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_DELETED, content:test._id})})
-                    }
-                }
-            }
+            if(!examinee) {reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}
+            var record = examinee.records.id(recordId);
+            if(!record) {reject({code: msg.EXAMINEE_RECORD_NOT_EXIST}); return;}
+            var test = record.tests.id(testId);
+            if(!test) {reject({code:msg.EXAMINEE_TEST_NOT_EXISTS}); return;}
+            test.isDeleted = true;
+            examinee.save(function(){resolve({code:msg.EXAMINEE_TEST_DELETED, content:test._id})})
         })
     });
 }
@@ -143,4 +87,4 @@ function list(examineeId, recordId){
     })
 }
 
-module.exports = {create, get, update, toggle, erase, list}
+module.exports = {create, get, update, erase, list}

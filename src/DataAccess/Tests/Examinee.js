@@ -9,18 +9,12 @@ const utils = require('../acessUtils');
 function create(testId, examineeId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var itemsLikeIt = test.examinees.filter(function(currentItem){
-                    return utils.isTheSame(currentItem, {examineeId:examineeId, active:true});
-                });
-                if(itemsLikeIt.length > 0) reject({code:msg.TEST_EXAMINEE_EXISTS});
-                else{
-                    var newExaminee = new Examinee({examineeId:examineeId, active:true});
-                    test.examinees.push(newExaminee);
-                    test.save(function(){resolve({code:msg.TEST_EXAMINEE_REGISTER, content:newExaminee._id})});
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var itemsLikeIt = test.examinees.filter(function(currentItem){return utils.isTheSame(currentItem, {examineeId:examineeId, isDeleted:false});});
+            if(itemsLikeIt.length > 0) {reject({code:msg.TEST_EXAMINEE_EXISTS}); return;}
+            var newExaminee = new Examinee({examineeId:examineeId, isDeleted:false});
+            test.examinees.push(newExaminee);
+            test.save(function(){resolve({code:msg.TEST_EXAMINEE_REGISTER, content:newExaminee._id})});
         });
     });
 }
@@ -31,12 +25,10 @@ function create(testId, examineeId){
 function get(testId, examineeId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examinee = test.examinees.id(examineeId);
-                if(!examinee) reject({code: msg.TEST_EXAMINEE_NOT_EXISTS});
-                else resolve({code:msg.TEST_EXAMINEE_FETCH, content:examinee});
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examinee = test.examinees.id(examineeId);
+            if(!examinee) {reject({code: msg.TEST_EXAMINEE_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_EXAMINEE_FETCH, content:examinee});
         });
     });
 }
@@ -47,59 +39,19 @@ function get(testId, examineeId){
 function update(testId, examineeId, newExamineeId, roomId, seat, registered, sheetNumber, presence){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examinee = test.examinees.id(examineeId);
-                if(!examinee) reject({code: msg.TEST_EXAMINEE_NOT_EXISTS});
-                else{
-                    if(newExamineeId) examinee.examineeId = newExamineeId;
-                    if(roomId) examinee.roomId = roomId;
-                    if(seat) examinee.seat = seat;
-                    if(registered) examinee.registered = registered;
-                    if(sheetNumber) examinee.sheetNumber = sheetNumber;
-                    if(presence) examinee.presence = presence;
-                    var itemsLikeIt = test.examinees.filter(function(currentItem){
-                        return utils.isTheSame(currentItem, {examineeId:examinee.examineeId, active:true});
-                    });
-                    itemsLikeIt= utils.removeSelf(itemsLikeIt, examinee);
-                    if(itemsLikeIt.length >0) reject({code:msg.TEST_EXAMINEE_EXISTS})
-                    else{
-                        test.save(function(){resolve({code:msg.TEST_EXAMINEE_UPDATED, content:examinee._id})})
-                    }   
-                }
-            }
-        });
-    });
-}
-
-/**
- *  Activates / Deactivates an test's examinee examinee returning a {code, content} result
- */
-function toggle(testId, examineeId){
-    return new Promise(function(resolve, reject){
-        Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examinee = test.examinees.id(examineeId);
-                if(!examinee) reject({code: msg.TEST_EXAMINEE_NOT_EXIST});
-                else{
-                    if(examinee.active){
-                        examinee.active=false;
-                        test.save(function(){resolve({code:msg.TEST_EXAMINEE_TOGGLED, content:test._id})})
-                    }
-                    else{
-                        var itemsLikeIt = test.examinees.filter(function(currentItem){
-                            return utils.isTheSame(currentItem, {examineeId:examinee.examineeId, active:true});
-                        });
-                        itemsLikeIt = utils.removeSelf(itemsLikeIt, examinee);
-                        if(itemsLikeIt.length >0) reject({code:msg.TEST_EXAMINEE_EXISTS})
-                        else{
-                            examinee.active=true;
-                            test.save(function(){resolve({code:msg.TEST_EXAMINEE_TOGGLED, content:examinee._id})})
-                        }   
-                    }
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examinee = test.examinees.id(examineeId);
+            if(!examinee) {reject({code: msg.TEST_EXAMINEE_NOT_EXISTS}); return;}
+            if(newExamineeId) examinee.examineeId = newExamineeId;
+            if(roomId) examinee.roomId = roomId;
+            if(seat) examinee.seat = seat;
+            if(registered) examinee.registered = registered;
+            if(sheetNumber) examinee.sheetNumber = sheetNumber;
+            if(presence) examinee.presence = presence;
+            var itemsLikeIt = test.examinees.filter(function(currentItem){ return utils.isTheSame(currentItem, {examineeId:examinee.examineeId, isDeleted:false});});
+            itemsLikeIt= utils.removeSelf(itemsLikeIt, examinee);
+            if(itemsLikeIt.length >0) {reject({code:msg.TEST_EXAMINEE_EXISTS}); return;}
+            test.save(function(){resolve({code:msg.TEST_EXAMINEE_UPDATED, content:examinee._id})})
         });
     });
 }
@@ -107,15 +59,11 @@ function toggle(testId, examineeId){
 function erase(testId, examineeId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examinee = test.examinee.id(examineeId);
-                if(!examinee) reject({code: msg.TEST_EXAMINEE_NOT_EXIST});
-                else{
-                    examinee.active=false;
-                    test.save(function(){resolve({code:msg.TEST_EXAMINEE_DELETED, content:examinee._id})})
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examinee = test.examinee.id(examineeId);
+            if(!examinee) {reject({code: msg.TEST_EXAMINEE_NOT_EXIST}); return;}
+            examinee.isDeleted=true;
+            test.save(function(){resolve({code:msg.TEST_EXAMINEE_DELETED, content:examinee._id})})
         });
     });
 }
@@ -126,10 +74,10 @@ function erase(testId, examineeId){
 function list(testId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test) reject({code: msg.TEST_NOT_EXISTS});
-            else resolve({code:msg.TEST_EXAMINEES_FETCH, content:test.examinees});
+            if(!test) {reject({code: msg.TEST_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_EXAMINEES_FETCH, content:test.examinees});
         });
     })
 }
 
-module.exports = {create, get, update, toggle, erase, list}
+module.exports = {create, get, update, erase, list}

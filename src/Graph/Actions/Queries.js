@@ -13,10 +13,8 @@ const msg = require('../../Config/messages');
 function subjects(token){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Subject.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Subject.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
 }
@@ -28,11 +26,8 @@ function subjects(token){
 function rooms(token){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            console.log(isAdmin);
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Room.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Room.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
 }
@@ -44,10 +39,8 @@ function rooms(token){
 function examinees(token){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Examinee.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Examinee.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
 }
@@ -59,10 +52,8 @@ function examinees(token){
 function examiners(token){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Examiners.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Examiner.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
 }
@@ -74,10 +65,8 @@ function examiners(token){
 function tests(token){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Test.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Test.list().then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
 }
@@ -90,45 +79,19 @@ function tests(token){
 function room(token, id){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                Room.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-                /*
-                Test.list().then(function(tests){
-                    tests = tests.content;
-                    Subject.list().then(function(subjects){
-                        subjects = subjects.content;
-                        Room.get(id).then(function(room){
-                            room = room.content;
-                            var roomData = {name:room.name, seats:room.seats, active:room.active, records:[]};
-                            room.records.forEach(function(record){
-                                var recordData = {year:record.year, active:record.active, tests:[]};
-                                record.tests.forEach(function(recordTest){
-                                    var test = tests.filter(function(test){return test._id==recordTest.testId});
-                                    if(test.length>0){
-                                        test = test[0];
-                                        var subject = subjects.filter(function(subject){return subject._id == test.subjectId});
-                                        if(subject.length>0){
-                                            subject = subject[0];
-                                            recordData.tests.push({
-                                                confirmationData:test.confirmationData,
-                                                dateStart:test.dateStart,
-                                                dateEnd:test.dateEnd,
-                                                subjectName: subject.name,
-                                                subjectField:subject.field,
-                                                type:test.type,
-                                                active:test.active
-                                            });
-                                        }
-                                    }
-                                });
-                                roomData.records.push(recordData);
-                            });
-                            resolve({code:msg.ROOM_FETCH, content:JSON.stringify(roomData)});
-                        }).catch(function(res){resolve(res)});
-                    }).catch(function(res){esolve(res)});
-                }).catch(function(res){resolve(res)});*/
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Room.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function roomNotAdmin(token, id){
+    return new Promise(function(resolve){
+        utils.isExaminer(token).then(function(isExaminer){
+            utils.isExaminee(token).then(function(isExaminer){
+                if(!(isExaminer || isExaminee)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                Room.get(id).then(function(res){res.content.records=null;resolve(res)}).catch(function(res){resolve(res)});
+            });
         });
     });
 }
@@ -140,32 +103,10 @@ function room(token, id){
  */
 function subject(token, id){
     return new Promise(function(resolve){
-        if(!utils.isAdmin(token)) resolve({code:NOT_ENOUGH_PERMISSIONS});
-        Test.list().then(function(tests){
-            tests = tests.content;
-            Subject.get(id).then(function(subject){
-                subject = subject.content;
-                var subjectData = {name:subject.name, field:subject.field, active:subject.active, records:[]};
-                subject.records.forEach(function(record){
-                    var recordData = {year:record.year, active:record.active, tests:[]};
-                    record.tests.forEach(function(recordTest){
-                        var test = tests.filter(function(test){console.log(test._id); console.log(recordTest.testId);return test._id == recordTest.testId});
-                        if(test.length>0){
-                            test = test[0];
-                            recordData.tests.push({
-                                confirmationData:test.confirmationData,
-                                dateStart:test.dateStart,
-                                dateEnd:test.dateEnd,
-                                type:test.type,
-                                active:test.active
-                            });
-                        }
-                    });
-                    subjectData.records.push(recordData);
-                });
-                resolve({code:msg.SUBJECT_FETCH, content:JSON.stringify(subjectData)});
-            }).catch(function(res){resolve(res)});
-        }).catch(function(res){resolve(res)});
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            subject.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+        });
     });
 }
 
@@ -175,7 +116,14 @@ function subject(token, id){
  * @param {string} id
  */
 function examiner(token, id){
-    return "TODO";
+    return new Promise(function(resolve){
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminer(token).then(function(isExaminer){
+                if(!(isAdmin || isExaminer)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                Examiner.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            });
+        });
+    });
 }
 
 /**
@@ -184,7 +132,14 @@ function examiner(token, id){
  * @param {string} id
  */
 function examinee(token, id){
-    return "TODO";
+    return new Promise(function(resolve){
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminee(token).then(function(isExaminee){
+                if(!(isAdmin || isExaminee)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                Examinee.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            });
+        });
+    });
 }
 
 /**
@@ -205,6 +160,7 @@ module.exports = {
     tests,
     subject,
     room,
+    roomNotAdmin,
     examinee,
     examiner,
     test

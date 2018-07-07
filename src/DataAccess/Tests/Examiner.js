@@ -9,18 +9,12 @@ const utils = require('../acessUtils');
 function create(testId, examinerId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var itemsLikeIt = test.examiners.filter(function(currentItem){
-                    return utils.isTheSame(currentItem, {examinerId:examinerId, active:true});
-                });
-                if(itemsLikeIt.length > 0) reject({code:msg.TEST_EXAMINER_EXISTS});
-                else{
-                    var newExaminer = new Examiner({examinerId:examinerId, active:true});
-                    test.examiners.push(newExaminer);
-                    test.save(function(){resolve({code:msg.TEST_EXAMINER_REGISTER, content:newExaminer._id})});
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var itemsLikeIt = test.examiners.filter(function(currentItem){return utils.isTheSame(currentItem, {examinerId:examinerId, isDeleted:false});});
+            if(itemsLikeIt.length > 0) reject({code:msg.TEST_EXAMINER_EXISTS});
+            var newExaminer = new Examiner({examinerId:examinerId, isDeleted:false});
+            test.examiners.push(newExaminer);
+            test.save(function(){resolve({code:msg.TEST_EXAMINER_REGISTER, content:newExaminer._id})});
         });
     });
 }
@@ -31,12 +25,10 @@ function create(testId, examinerId){
 function get(testId, examinerId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examiner = test.examiners.id(examinerId);
-                if(!examiner) reject({code: msg.TEST_EXAMINER_NOT_EXISTS});
-                else resolve({code:msg.TEST_EXAMINER_FETCH, content:examiner});
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examiner = test.examiners.id(examinerId);
+            if(!examiner) {reject({code: msg.TEST_EXAMINER_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_EXAMINER_FETCH, content:examiner});
         });
     });
 }
@@ -47,55 +39,15 @@ function get(testId, examinerId){
 function update(testId, examinerId, newExaminerId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examiner = test.examiners.id(examinerId);
-                if(!examiner) reject({code: msg.TEST_EXAMINER_NOT_EXISTS});
-                else{
-                    if(newExaminerId) examiner.examinerId = newExaminerId;
-                    if(roomId) examiner.roomId = roomId;
-                    var itemsLikeIt = test.examiners.filter(function(currentItem){
-                        return utils.isTheSame(currentItem, {examinerId:examiner.examinerId, active:true});
-                    });
-                    itemsLikeIt= utils.removeSelf(itemsLikeIt, examiner);
-                    if(itemsLikeIt.length >0) reject({code:msg.TEST_EXAMINER_EXISTS})
-                    else{
-                        test.save(function(){resolve({code:msg.TEST_EXAMINER_UPDATED, content:examiner._id})})
-                    }   
-                }
-            }
-        });
-    });
-}
-
-/**
- *  Activates / Deactivates an test's examiner examiner returning a {code, content} result
- */
-function toggle(testId, examinerId){
-    return new Promise(function(resolve, reject){
-        Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examiner = test.examiners.id(examinerId);
-                if(!examiner) reject({code: msg.TEST_EXAMINER_NOT_EXIST});
-                else{
-                    if(examiner.active){
-                        examiner.active=false;
-                        test.save(function(){resolve({code:msg.TEST_EXAMINER_TOGGLED, content:test._id})})
-                    }
-                    else{
-                        var itemsLikeIt = test.examiners.filter(function(currentItem){
-                            return utils.isTheSame(currentItem, {examinerId:examiner.examinerId, active:true});
-                        });
-                        itemsLikeIt = utils.removeSelf(itemsLikeIt, examiner);
-                        if(itemsLikeIt.length >0) reject({code:msg.TEST_EXAMINER_EXISTS})
-                        else{
-                            examiner.active=true;
-                            test.save(function(){resolve({code:msg.TEST_EXAMINER_TOGGLED, content:examiner._id})})
-                        }   
-                    }
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examiner = test.examiners.id(examinerId);
+            if(!examiner) {reject({code: msg.TEST_EXAMINER_NOT_EXISTS}); return;}
+            if(newExaminerId) examiner.examinerId = newExaminerId;
+            if(roomId) examiner.roomId = roomId;
+            var itemsLikeIt = test.examiners.filter(function(currentItem){return utils.isTheSame(currentItem, {examinerId:examiner.examinerId, isDeleted:false});});
+            itemsLikeIt= utils.removeSelf(itemsLikeIt, examiner);
+            if(itemsLikeIt.length >0) {reject({code:msg.TEST_EXAMINER_EXISTS}); return;}
+            test.save(function(){resolve({code:msg.TEST_EXAMINER_UPDATED, content:examiner._id})})
         });
     });
 }
@@ -103,15 +55,11 @@ function toggle(testId, examinerId){
 function erase(testId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var examiner = test.examiner.id(roomId);
-                if(!examiner) reject({code: msg.TEST_EXAMINER_NOT_EXIST});
-                else{
-                    examiner.active=false;
-                    test.save(function(){resolve({code:msg.TEST_EXAMINER_DELETED, content:examiner._id})})
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var examiner = test.examiner.id(roomId);
+            if(!examiner) {reject({code: msg.TEST_EXAMINER_NOT_EXIST}); return;}
+            examiner.isDeleted=truefalse;
+            test.save(function(){resolve({code:msg.TEST_EXAMINER_DELETED, content:examiner._id})})
         });
     });
 }
@@ -122,10 +70,10 @@ function erase(testId, roomId){
 function list(testId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test) reject({code: msg.TEST_NOT_EXISTS});
-            else resolve({code:msg.TEST_EXAMINERS_FETCH, content:test.examiners});
+            if(!test) {reject({code: msg.TEST_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_EXAMINERS_FETCH, content:test.examiners});
         });
     })
 }
 
-module.exports = {create, get, update, toggle, erase, list}
+module.exports = {create, get, update, erase, list}

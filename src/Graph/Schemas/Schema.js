@@ -199,8 +199,8 @@ function schema(){
             registerCurrentRoomRecord(token:String! id:String!):IDResult
             registerCurrentSubjectRecord(token:String! id:String!):IDResult
             registerRoom(token:String! name:String seats:Int):IDResult
-            registerSubject(token:String! name:String filed:String):IDResult
-            registerExaminee(token:String! name:String! identification:String! email:String!):IDResult
+            registerSubject(token:String! name:String field:String):IDResult
+            registerExaminee(token:String! name:String! identification:String! email:String! course:String! studentNumber:String!):IDResult
             registerExaminer(token:String! name:String! identification:String! email:String!):IDResult
             registerTest(token:String!  dateStart:String! dateEnd:String! dateLimit:String! subjectId:String! type:String!):IDResult
         }

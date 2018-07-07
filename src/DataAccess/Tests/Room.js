@@ -9,18 +9,12 @@ const utils = require('../acessUtils');
 function create(testId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var itemsLikeIt = test.rooms.filter(function(currentItem){
-                    return utils.isTheSame(currentItem, {roomId:roomId, active:true});
-                });
-                if(itemsLikeIt.length > 0) reject({code:msg.TEST_ROOM_EXISTS});
-                else{
-                    var newRoom = new Room({roomId, active:true});
-                    test.rooms.push(newRoom);
-                    test.save(function(){resolve({code:msg.TEST_ROOM_REGISTER, content:newRoom._id})});
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var itemsLikeIt = test.rooms.filter(function(currentItem){return utils.isTheSame(currentItem, {roomId:roomId, isDeleted:false});});
+            if(itemsLikeIt.length > 0) {reject({code:msg.TEST_ROOM_EXISTS}); return;}
+            var newRoom = new Room({roomId, isDeleted:false});
+            test.rooms.push(newRoom);
+            test.save(function(){resolve({code:msg.TEST_ROOM_REGISTER, content:newRoom._id})});
         });
     });
 }
@@ -31,12 +25,10 @@ function create(testId, roomId){
 function get(testId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var room = test.rooms.id(roomId);
-                if(!room) reject({code: msg.TEST_ROOM_NOT_EXISTS});
-                else resolve({code:msg.TEST_ROOM_FETCH, content:room});
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var room = test.rooms.id(roomId);
+            if(!room) {reject({code: msg.TEST_ROOM_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_ROOM_FETCH, content:room});
         });
     });
 }
@@ -47,54 +39,14 @@ function get(testId, roomId){
 function update(testId, roomId, newRoomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var room = test.rooms.id(roomId);
-                if(!room) reject({code: msg.TEST_ROOM_NOT_EXISTS});
-                else{
-                    if(newRoomId) room.roomId = newRoomId;
-                    var itemsLikeIt = test.rooms.filter(function(currentItem){
-                        return utils.isTheSame(currentItem, {roomId:room.roomId, active:true});
-                    });
-                    itemsLikeIt= utils.removeSelf(itemsLikeIt, room);
-                    if(itemsLikeIt.length >0) reject({code:msg.TEST_ROOM_EXISTS})
-                    else{
-                        test.save(function(){resolve({code:msg.TEST_ROOM_UPDATED, content:room._id})})
-                    }   
-                }
-            }
-        });
-    });
-}
-
-/**
- *  Activates / Deactivates an test's room room returning a {code, content} result
- */
-function toggle(testId, roomId){
-    return new Promise(function(resolve, reject){
-        Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var room = test.rooms.id(roomId);
-                if(!room) reject({code: msg.TEST_ROOM_NOT_EXIST});
-                else{
-                    if(room.active){
-                        room.active=false;
-                        test.save(function(){resolve({code:msg.TEST_ROOM_TOGGLED, content:test._id})})
-                    }
-                    else{
-                        var itemsLikeIt = test.rooms.filter(function(currentItem){
-                            return utils.isTheSame(currentItem, {roomId:room.roomId, active:true});
-                        });
-                        itemsLikeIt = utils.removeSelf(itemsLikeIt, room);
-                        if(itemsLikeIt.length >0) reject({code:msg.TEST_ROOM_EXISTS})
-                        else{
-                            room.active=true;
-                            test.save(function(){resolve({code:msg.TEST_ROOM_TOGGLED, content:room._id})})
-                        }   
-                    }
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var room = test.rooms.id(roomId);
+            if(!room) {reject({code: msg.TEST_ROOM_NOT_EXISTS}); return;}
+            if(newRoomId) room.roomId = newRoomId;
+            var itemsLikeIt = test.rooms.filter(function(currentItem){return utils.isTheSame(currentItem, {roomId:room.roomId, isDeleted:false});});
+            itemsLikeIt= utils.removeSelf(itemsLikeIt, room);
+            if(itemsLikeIt.length >0) {reject({code:msg.TEST_ROOM_EXISTS}); return;}
+            test.save(function(){resolve({code:msg.TEST_ROOM_UPDATED, content:room._id})})
         });
     });
 }
@@ -102,15 +54,11 @@ function toggle(testId, roomId){
 function erase(testId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test)reject({code:msg.TEST_NOT_EXISTS});
-            else{
-                var room = test.rooms.id(roomId);
-                if(!room) reject({code: msg.TEST_ROOM_NOT_EXIST});
-                else{
-                    room.active=false;
-                    test.save(function(){resolve({code:msg.TEST_ROOM_DELETED, content:test._id})})
-                }
-            }
+            if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
+            var room = test.rooms.id(roomId);
+            if(!room) {reject({code: msg.TEST_ROOM_NOT_EXIST}); return;}
+            room.isDeleted = true;
+            test.save(function(){resolve({code:msg.TEST_ROOM_DELETED, content:test._id})})
         });
     });
 }
@@ -121,10 +69,10 @@ function erase(testId, roomId){
 function list(testId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
-            if(!test) reject({code: msg.TEST_NOT_EXISTS});
-            else resolve({code:msg.TEST_ROOMS_FETCH, content:test.rooms});
+            if(!test) {reject({code: msg.TEST_NOT_EXISTS}); return;}
+            resolve({code:msg.TEST_ROOMS_FETCH, content:test.rooms});
         });
     })
 }
 
-module.exports = {create, get, update, toggle, erase, list}
+module.exports = {create, get, update, erase, list}

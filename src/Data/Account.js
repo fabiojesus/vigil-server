@@ -6,7 +6,7 @@ const AccountSchema = new Schema({
     email:String,
     password:String,
     role:Number,
-    active:Boolean
+    isDeleted:Boolean
 });
 
 const TokenSchema = new Schema({

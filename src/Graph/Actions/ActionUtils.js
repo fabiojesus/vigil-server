@@ -3,6 +3,7 @@ const decode = require('jwt-decode');
 const jsonwebtoken = require("jsonwebtoken");
 const Account = require('../../DataAccess/Accounts/Account');
 const msg = require('../../Config/messages');
+const roles = require('../../Config/roles');
 
 function sendEmail(email, content){
     var nodemailer = require('nodemailer');
@@ -57,23 +58,32 @@ function getCurrentYear(){
     return currentYear;
 }
 
+
 async function isAdmin(token){
     return new Promise(function(resolve, reject){
         Token.search(token).then(function(tokenItem){
             var decoded = decode(token);
-            resolve(tokenItem && decoded.role=="administrator");
+            resolve(tokenItem && decoded.role==roles.ADMINISTRATOR);
         });
     });
 }
 
-function isExaminer(token){
-    var decoded = decode(token);
-    return decoded.role == "examiner";
+async function isExaminer(token){
+    return new Promise(function(resolve, reject){
+        Token.search(token).then(function(tokenItem){
+            var decoded = decode(token);
+            resolve(token && decoded.role == roles.EXAMINER)
+        });
+    });
 }
 
-function isExaminee(token){
-    var decoded = decode(token);
-    return decoded.role == "examinee";
+async function isExaminee(token){
+    return new Promise(function(resolve, reject){
+        Token.search(token).then(function(tokenItem){
+            var decoded = decode(token);
+            resolve(token && decoded.role == roles.EXAMINEE)
+        });
+    });
 }
 
 function createToken(account){
@@ -90,7 +100,7 @@ function validateAccount(email, password){
                 Token.create(tokenValue).then(resolve({code:msg.LOGIN_SUCCESSFUL, token:tokenValue})).catch(function(res){resolve(res)})
             }
             else resolve({code:msg.ACCOUNT_NOT_EXISTS});
-        }).catch(function(err){resolve(err)});
+        }).catch(function(err){reject(err)});
     });
 }
 

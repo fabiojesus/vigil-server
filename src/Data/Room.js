@@ -3,19 +3,19 @@ const Schema = mongoose.Schema;
 
 const RoomRecordTestSchema = new Schema({
     testId: String,
-    active: Boolean
+    isDeleted: Boolean
 });
 
 const RoomRecordSchema = new Schema({
     year: String,
-    active: Boolean,
+    isDeleted: Boolean,
     tests: [RoomRecordTestSchema]
 });
 
 const RoomSchema = new Schema({
     name: String,
     seats: Number,
-    active: Boolean,
+    isDeleted: Boolean,
     records: [RoomRecordSchema]
 });
 

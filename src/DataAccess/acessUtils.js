@@ -20,7 +20,16 @@ function removeSelf(list, item){
     return newList;
 }
 
+function isEmpty(items){
+    var isEmpty = true;
+    items.forEach(function(item){
+        if(!item.isDeleted) isEmpty = false;
+    })
+    return isEmpty;
+}
+
 module.exports = {
     isTheSame,
-    removeSelf
+    removeSelf,
+    isEmpty
 }

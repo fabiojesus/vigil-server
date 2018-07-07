@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const TestExaminerSchema = new Schema({
     examinerId: String,
     roomId: String,
-    active:Boolean,
+    isDeleted:Boolean,
 });
 
 const TestExamineeSchema = new Schema({
-    active:Boolean,
+    isDeleted:Boolean,
     examineeId: String,
     roomId: String,
     seat: Number,
@@ -19,7 +19,7 @@ const TestExamineeSchema = new Schema({
 
 const TestRoomSchema = new Schema({
     roomId: String,
-    active:Boolean
+    isDeleted:Boolean
 });
 
 const TestSchema = new Schema({
@@ -29,7 +29,7 @@ const TestSchema = new Schema({
     dateEnd: String,
     subjectId: String,
     type: String,
-    active: Boolean,
+    isDeleted: Boolean,
     rooms: [TestRoomSchema],
     examinees: [TestExamineeSchema],
     examiners: [TestExaminerSchema]

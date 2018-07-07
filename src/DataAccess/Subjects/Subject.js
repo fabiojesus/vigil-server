@@ -7,12 +7,10 @@ const utils = require('../acessUtils');
  */
 function create(name, field){
     return new Promise(function(resolve, reject){
-        Subject.find({name:name, active:true}).then(function(subjects){
-            if(subjects.length>0) reject({code:msg.SUBJECT_EXISTS});
-            else{
-                var subject = new Subject({name:name, field:field, active:true});
-                subject.save(function(){resolve({code:msg.SUBJECT_REGISTER, content:subject._id})});
-            }
+        Subject.find({name:name, isDeleted:false}).then(function(subjects){
+            if(subjects.length>0) {reject({code:msg.SUBJECT_EXISTS}); return;}
+            var subject = new Subject({name:name, field:field, isDeleted:false});
+            subject.save(function(){resolve({code:msg.SUBJECT_REGISTER, content:subject._id})});
         });
     });
 }
@@ -23,8 +21,8 @@ function create(name, field){
 function get(id){
     return new Promise(function(resolve, reject){
         Subject.findById(id).then(function(subject){
-            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS});
-            else resolve({code:msg.SUBJECT_FETCH, content:subject});
+            if(!subject) {reject({code:msg.SUBJECT_NOT_EXISTS}); return;}
+            resolve({code:msg.SUBJECT_FETCH, content:subject});
         });
     });
 }
@@ -35,55 +33,24 @@ function get(id){
 function update(id, name, field){
     return new Promise(function(resolve, reject){
         Subject.findById(id).then(function(subject){
-            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
-            else{
-                if(name) subject.name = name;
-                if(field) subject.field = field;
-                Subject.find({name:subject.name, active:true, _id: {$ne: subject._id}}).then(function(subjects){
-                    if(subjects.length>0) reject({code:msg.SUBJECT_EXISTS})
-                    else{
-                        subject.save(function(){resolve({code:msg.SUBJECT_UPDATED, content:subject._id})});    
-                    }
-                });
-            }
+            if(!subject) {reject({code:msg.SUBJECT_NOT_EXISTS}); return;}
+            if(name) subject.name = name;
+            if(field) subject.field = field;
+            Subject.find({name:subject.name, isDeleted:false, _id: {$ne: subject._id}}).then(function(subjects){
+                if(subjects.length>0) {reject({code:msg.SUBJECT_EXISTS}); return;}
+                subject.save(function(){resolve({code:msg.SUBJECT_UPDATED, content:subject._id})});    
+            });
         })
-    });
-}
-
-/**
- *  Activates / Deactivates an existing Subject Record returning a {code, content} result
- */
-function toggle(id){
-    return new Promise(function(resolve, reject){
-        Subject.findById(id).then(function(subject){
-            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
-            else{
-                if(subject.active){
-                    subject.active = false;
-                    subject.save(function(){resolve({code:msg.SUBJECT_TOGGLED, content:subject._id})})
-                }
-                else{
-                    Subject.find({name:subject.name, active:true, _id: {$ne: subject._id}}).then(function(subjects){
-                        if(subjects.length>0) reject({code:msg.SUBJECT_EXISTS})
-                        else{
-                            subject.active = true;
-                            subject.save(function(){resolve({code:msg.SUBJECT_TOGGLED, content:subject._id})});    
-                        }
-                    });
-                }
-            }
-        });
     });
 }
 
 function erase(id){
     return new Promise(function(resolve, reject){
         Subject.findById(id).then(function(subject){
-            if(!subject) reject({code:msg.SUBJECT_NOT_EXISTS})
-            else{
-                subject.active = false;
-                subject.save(function(){resolve({code:msg.SUBJECT_DELETED, content:subject._id})});
-            }
+            if(!subject) {reject({code:msg.SUBJECT_NOT_EXISTS}); return;}
+            if(!utils.isEmpty(examinee.records)){reject({code:msg.SUBJECT_HAS_RECORDS}); return;}
+            subject.isDeleted = true;
+            subject.save(function(){resolve({code:msg.SUBJECT_DELETED, content:subject._id})});
         }).catch(function(res){reject(res)})
     });
 }
@@ -92,11 +59,9 @@ function erase(id){
  * Searches for all Subject Records returning a {code, content} result that may include the subjects' list
  */
 function list(){
-    return new Promise(function(resolve, reject){
-        Subject.find({}).then(function(result){
-            resolve({code: msg.SUBJECTS_FETCH, content:result});
-        });
+    return new Promise(function(resolve){
+        Subject.find({}).then(function(result){ resolve({code: msg.SUBJECTS_FETCH, content:result});});
     });
 }
 
-module.exports = {create, get, update, toggle, erase, list};
+module.exports = {create, get, update, erase, list};

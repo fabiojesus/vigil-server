@@ -4,21 +4,21 @@ const Schema = mongoose.Schema;
 
 const RecordTestSchema = new Schema({
     testId: String,
-    active: Boolean
+    isDeleted: Boolean
 });
 
 const ExamineeRecordSchema = new Schema({
     year: String,
     course: String,
     studentNumber: String,
-    active: Boolean,
+    isDeleted: Boolean,
     tests: [RecordTestSchema]
 });
 
 const ExamineeSchema = new Schema({
     name: String,
     identification: String,
-    active: Boolean,
+    isDeleted: Boolean,
     records: [ExamineeRecordSchema]
 });
 

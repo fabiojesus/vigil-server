@@ -9,18 +9,12 @@ const utils = require('../acessUtils');
 function create(roomId, year){
     return new Promise(function(resolve, reject){
         Room.findById(roomId).then(function(room){
-            if(!room)reject({code:msg.ROOM_NOT_EXISTS});
-            else{
-                var itemsLikeIt = room.records.filter(function(currentItem){
-                    return utils.isTheSame(currentItem, {year:year, active:true});
-                });
-                if(itemsLikeIt.length > 0) reject({code:msg.ROOM_RECORD_EXISTS});
-                else{
-                    var newRecord = new Record({year, active:true});
-                    room.records.push(newRecord);
-                    room.save(function(){resolve({code:msg.ROOM_RECORD_REGISTER, content:newRecord._id})});
-                }
-            }
+            if(!room){reject({code:msg.ROOM_NOT_EXISTS});return;}
+            var itemsLikeIt = room.records.filter(function(currentItem){return utils.isTheSame(currentItem, {year:year, isDeleted:false});});
+            if(itemsLikeIt.length > 0) {reject({code:msg.ROOM_RECORD_EXISTS}); return;}
+            var newRecord = new Record({year, isDeleted:false});
+            room.records.push(newRecord);
+            room.save(function(){resolve({code:msg.ROOM_RECORD_REGISTER, content:newRecord._id})});
         });
     });
 }
@@ -31,12 +25,10 @@ function create(roomId, year){
 function get(roomId, recordId){
     return new Promise(function(resolve, reject){
         Room.findById(roomId).then(function(room){
-            if(!room)reject({code:msg.ROOM_NOT_EXISTS});
-            else{
-                var record = room.records.id(recordId);
-                if(!record) reject({code: msg.ROOM_RECORD_NOT_EXIST});
-                else resolve({code:msg.ROOM_RECORD_FETCH, content:record});
-            }
+            if(!room){reject({code:msg.ROOM_NOT_EXISTS}); return;}
+            var record = room.records.id(recordId);
+            if(!record) {reject({code: msg.ROOM_RECORD_NOT_EXIST}); return;}
+            resolve({code:msg.ROOM_RECORD_FETCH, content:record});
         });
     });
 }
@@ -47,54 +39,14 @@ function get(roomId, recordId){
 function update(roomId, recordId, year){
     return new Promise(function(resolve, reject){
         Room.findById(roomId).then(function(room){
-            if(!room)reject({code:msg.ROOM_NOT_EXISTS});
-            else{
-                var record = room.records.id(recordId);
-                if(!record) reject({code: msg.ROOM_RECORD_NOT_EXIST});
-                else{
-                    if(year) record.year = year;
-                    var itemsLikeIt = room.records.filter(function(currentItem){
-                        return utils.isTheSame(currentItem, {year:record.year, active:true});
-                    });
-                    itemsLikeIt= utils.removeSelf(itemsLikeIt, record);
-                    if(itemsLikeIt.length >0) reject({code:msg.ROOM_RECORD_EXISTS})
-                    else{
-                        room.save(function(){resolve({code:msg.ROOM_RECORD_UPDATED, content:record._id})})
-                    }   
-                }
-            }
-        });
-    });
-}
-
-/**
- *  Activates / Deactivates an room's record record returning a {code, content} result
- */
-function toggle(roomId, recordId){
-    return new Promise(function(resolve, reject){
-        Room.findById(roomId).then(function(room){
-            if(!room)reject({code:msg.ROOM_NOT_EXISTS});
-            else{
-                var record = room.records.id(recordId);
-                if(!record) reject({code: msg.ROOM_RECORD_NOT_EXIST});
-                else{
-                    if(record.active){
-                        record.active=false;
-                        room.save(function(){resolve({code:msg.ROOM_RECORD_TOGGLED, content:room._id})})
-                    }
-                    else{
-                        var itemsLikeIt = room.records.filter(function(currentItem){
-                            return utils.isTheSame(currentItem, {year:record.year, active:true});
-                        });
-                        itemsLikeIt = utils.removeSelf(itemsLikeIt, record);
-                        if(itemsLikeIt.length >0) reject({code:msg.ROOM_RECORD_EXISTS})
-                        else{
-                            record.active=true;
-                            room.save(function(){resolve({code:msg.ROOM_RECORD_TOGGLED, content:record._id})})
-                        }   
-                    }
-                }
-            }
+            if(!room){reject({code:msg.ROOM_NOT_EXISTS}); return;}
+            var record = room.records.id(recordId);
+            if(!record) {reject({code: msg.ROOM_RECORD_NOT_EXIST}); return;}
+            if(year) record.year = year;
+            var itemsLikeIt = room.records.filter(function(currentItem){return utils.isTheSame(currentItem, {year:record.year, isDeleted:false});});
+            itemsLikeIt= utils.removeSelf(itemsLikeIt, record);
+            if(itemsLikeIt.length >0) {reject({code:msg.ROOM_RECORD_EXISTS}); return;}
+            room.save(function(){resolve({code:msg.ROOM_RECORD_UPDATED, content:record._id})})
         });
     });
 }
@@ -102,15 +54,12 @@ function toggle(roomId, recordId){
 function erase(id){
     return new Promise(function(resolve, reject){
         Room.findById(id).then(function(room){
-            if(!room) reject({code:msg.ROOM_NOT_EXISTS})
-            else{
-                var record = room.records.id(recordId);
-                if(!record) reject({code: msg.ROOM_RECORD_NOT_EXIST});
-                else{
-                    record.active = false;
-                    room.save(function(){resolve({code:msg.ROOM_RECORD_DELETED, content:record._id})})
-                }
-            }
+            if(!room) {reject({code:msg.ROOM_NOT_EXISTS}); return;}
+            var record = room.records.id(recordId);
+            if(!record) {reject({code: msg.ROOM_RECORD_NOT_EXIST}); return;}
+            if(!isEmpty(record.tests)){reject({code:msg.ROOM_RECORD_HAS_TESTS}); return;}
+            record.isDeleted = true;
+            room.save(function(){resolve({code:msg.ROOM_RECORD_DELETED, content:record._id})})
         }).catch(function(res){reject(res)})
     });
 }
@@ -121,10 +70,10 @@ function erase(id){
 function list(roomId){
     return new Promise(function(resolve, reject){
         Room.findById(roomId).then(function(room){
-            if(!room) reject({code: msg.ROOM_NOT_EXISTS});
-            else resolve({code:msg.ROOM_RECORDS_FETCH, content:room.records});
+            if(!room) {reject({code: msg.ROOM_NOT_EXISTS}); return;}
+            resolve({code:msg.ROOM_RECORDS_FETCH, content:room.records});
         });
     })
 }
 
-module.exports = {create, get, update, toggle, erase, list}
+module.exports = {create, get, update, erase, list}
