@@ -21,7 +21,7 @@ const roles = require('../../Config/roles');
  */
 function login(email, password){
     return new Promise(function(resolve, reject){
-        utils.validateAccount(email, password).then(function(res){resolve(res)});
+        utils.validateAccount(email, password).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
     });
 }
 
