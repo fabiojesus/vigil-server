@@ -185,7 +185,6 @@ module.exports = {
     tests,
     subject,
     room,
-    roomNotAdmin,
     examinee,
     examiner,
     test
