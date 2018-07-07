@@ -206,7 +206,6 @@ function schema(){
             registerCurrentSubjectRecord(token:String! id:String!):IDResult
             registerCurrentExaminerRecord(token:String! id:String!):IDResult
             registerCurrentExamineeRecord(token:String! id:String! course:String! studentNumber:String!):IDResult
-            renewExamineeRecord(token:String! id:String!):IDResult
             updateRoom(token:String! id:String! name:String seats:Int):IDResult
             updateSubject(token:String! id:String! name:String field:String):IDResult
             updateExaminer(token:String! id:String! name:String identification:String):IDResult

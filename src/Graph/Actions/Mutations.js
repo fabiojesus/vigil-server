@@ -179,13 +179,15 @@ function registerCurrentExamineeRecord(token, examineeId, course, studentNumber)
 
 function renewExamineeRecord(token, examineeId){
     return new Promise(function(resolve, reject){
-        Examinee.get(examineeId).then(function(examinee){
-            if(!examinee.content){resolve(examinee);return;}
-            examinee = examinee.content;
-            var lastRecord = examinee.records[examinee.records.length-1];
-            console.log(lastRecord);
-        }).catch(function(res){resolve(res)});
-    })
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Examinee.get(examineeId).then(function(examinee){
+                if(!examinee.content){resolve(examinee);return;}
+                examinee = examinee.content;
+                var lastRecord = examinee.records[examinee.records.length-1];
+            }).catch(function(res){resolve(res)});
+        });
+    });
 }
 
 function registerSubjectRecord(token, subjectId, year){
