@@ -24,21 +24,20 @@ function resolvers(){
         registerCurrentExamineeRecord: (args)=>{return Mutations.registerCurrentExamineeRecord(args.token, args.id, args.course, args.studentNumber)},
         registerCurrentExaminerRecord: (args)=>{return Mutations.registerCurrentExaminerRecord(args.token, args.id)},
         renewExamineeRecord: (args)=> {return Mutations.renewExamineeRecord(args.token, args.id)},
-        updateRoom: (args) => {return Actions.updateRoom(args.token, args.id, args.name, args.seats)},
-        updateSubject: (args) => {return Actions.updateSubject(args.token, args.id, args.name, args.field)},
-        updateExaminer: (args) => {return Actions.updateExaminer(args.token, args.id, args.identification, args.name)},
-        updateExaminee: (args) => {return Actions.updateExaminee(args.token, args.id, args.identification, args.name)},
-        updateExaminerRecord: (args) => {return Actions.updateExamineeRecord(args.token, args.id, args.recordId, args.course, args.studentNumber)},
-        deleteRoom: (args) => {return Actions.deleteRoom(args.token, args.id)},
-        deleteSubject: (args) => {return Actions.deleteSubject(args.token, args.is)}
-        /*
-        registerCurrentSubjectRecord: (args) => {return Actions.registerCurrentSubjectRecord(args)},
-        addRoomToTest: (args) => {return Actions.addRoomToTest(args.testId, args.roomId)},
-        addExaminerToTest: (args) => {return Actions.addExaminerToTest(args.testId, args.examinerId)},
-        addExamineeToTest: (args) => {return Actions.addExamineeToTest(args.testId, args.examineeId)},
-        setExaminerToRoom: (args) => {return Actions.setExaminerToRoom(args.testId, args.examinerId, args.roomId)},
-        setExamineeToRoom: (args) => {return Actions.setExamineeToRoom(args.testId, args.examineeId, args.roomId, args.seats)},
-*/
+        updateRoom: (args) => {return Mutations.updateRoom(args.token, args.id, args.name, args.seats)},
+        updateSubject: (args) => {return Mutations.updateSubject(args.token, args.id, args.name, args.field)},
+        updateExaminer: (args) => {return Mutations.updateExaminer(args.token, args.id, args.identification, args.name)},
+        updateExaminee: (args) => {return Mutations.updateExaminee(args.token, args.id, args.identification, args.name)},
+        updateExaminerRecord: (args) => {return Mutations.updateExamineeRecord(args.token, args.id, args.recordId, args.course, args.studentNumber)},
+        deleteRoom: (args) => {return Mutations.deleteRoom(args.token, args.id)},
+        deleteSubject: (args) => {return Mutations.deleteSubject(args.token, args.id)},
+        addRoomToTest: (args) => {return Mutations.addRoomToTest(args.token, args.id, args.roomId)},
+        addExamineeToTest: (args) => {return Mutations.addExamineeToTest(args.token, args.id, args.examineeId)},
+        addExaminerToTest: (args) => {return Mutations.addExaminerToTest(args.token, args.id, args.examinerId)},
+        setExaminerToTestRoom: (args) => {return Mutations.setExaminerToTestRoom(args.token, args.id, args.roomId, args.examinerId)},
+        setExamineeToTestRoom: (args) => {return Mutations.setExamineeToTestRoom(args.token, args.id, args.examineeId, args.roomId, args.seat)},
+        confirmPresence: (args) => {return Mutations.confirmPresence(args.token, args.id, args.examineeId)},
+        checkIn: (args) => {return Mutations.checkIn(args.token, args.id, args.examineeId, args.sheetNumber)}
     }
 }
 

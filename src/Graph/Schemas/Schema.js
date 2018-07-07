@@ -213,6 +213,11 @@ function schema(){
             updateExaminerRecord(token:String! id:String! recordId:String! course:String studentNumber:String):IDResult
             deleteRoom(token:String! id:String!):IDResult
             deleteSubject(token:String! id:String!):IDResult
+            addRoomToTest(token:String! id:String! roomId:String!):IDResult
+            setExaminerToTestRoom(token:String! id:String! roomId:String! examinerId:String!):IDResult
+            setExamineeToTestRoom(token:String! id:String! examineeId:String! roomId:String! seat:Int):IDResult
+            confirmPresence(token:String! id:String! examineeId:String!):IDResult
+            checkIn(token:String! id:String! examineeId:String! sheetNumber:String!):IDResult
         }
     `);
 }

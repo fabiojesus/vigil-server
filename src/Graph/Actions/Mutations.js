@@ -1,15 +1,24 @@
 const Account = require('../../DataAccess/Accounts/Account');
 const Examinee = require('../../DataAccess/Examinees/Examinee');
 const ExamineeRecord = require('../../DataAccess/Examinees/Record');
+const ExamineeTest = require('../../DataAccess/Examinees/Test');
+
 const Examiner = require('../../DataAccess/Examiners/Examiner');
 const ExaminerRecord = require('../../DataAccess/Examiners/Record');
+const ExaminerTest = require('../../DataAccess/Examiners/Test');
+
 const msg = require('../../Config/messages');
 const Room = require('../../DataAccess/Rooms/Room');
-const RoomRecord = require('../../DataAccess/Rooms/Record')
+const RoomRecord = require('../../DataAccess/Rooms/Record');
+const RoomTest = require('../../DataAccess/Rooms/Test');
 const Subject = require("../../DataAccess/Subjects/Subject");
 const SubjectRecord = require("../../DataAccess/Subjects/Record");
 const SubjectTest = require('../../DataAccess/Subjects/Test');
 const Test = require('../../DataAccess/Tests/Test');
+const TestRoom = require('../../DataAccess/Tests/Room');
+const TestExaminee = require('../../DataAccess/Tests/Examinee');
+const TestExaminer = require('../../DataAccess/Tests/Examiner');
+
 const Token = require('../../DataAccess/Accounts/Token');
 const utils = require('./ActionUtils');
 const roles = require('../../Config/roles');
@@ -113,7 +122,6 @@ function registerExaminer(token, name, identification, email){
 
 function registerTest(token, dateStart, dateEnd, dateLimit, subjectId, type){
     return new Promise(function(resolve){
-        console.log(token);
         utils.isAdmin(token).then(function(isAdmin){
             if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
             else{
@@ -264,6 +272,141 @@ function deleteSubject(token, subjectId){
     });
 }
 
+function addRoomToTest(token, testId, roomId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                var limitDate = new Date(test.content.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                TestRoom.create(testId, roomId).then(function(testRoom){
+                    Room.get(roomId).then(function(room){
+                        room = room.content;
+                        var lastRecord = room.records[room.records.length-1];
+                        RoomTest.create(roomId, lastRecord._id, testId).then(function(roomTest){
+                            resolve(roomTest);
+                        }).catch(function(res){resolve(res)});
+                    }).catch(function(res){resolve(res)})
+                }).catch(function(res){resolve(res)});      
+            }).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function addExaminerToTest(token, testId, examinerId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                var limitDate = new Date(test.content.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                TestExaminer.create(testId, examinerId).then(function(testExaminer){
+                    Examiner.get(examinerId).then(function(examiner){
+                        examiner = examiner.content;
+                        var lastRecord = examiner.records[examiner.records.length-1];
+                        ExaminerTest.create(examinerId, lastRecord._id, testId).then(function(examinerTest){
+                            resolve(examinerTest);
+                        }).catch(function(res){resolve(res)});
+                    }).catch(function(res){resolve(res)})
+                }).catch(function(res){resolve(res)});      
+            }).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function addExamineeToTest(token, testId, examineeId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                var limitDate = new Date(test.content.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                TestExaminee.create(testId, examineeId).then(function(testExaminee){
+                    Examinee.get(examineeId).then(function(examinee){
+                        examinee = examinee.content;
+                        var lastRecord = examinee.records[examinee.records.length-1];
+                        ExamineeTest.create(examineeId, lastRecord._id, testId).then(function(examineeTest){
+                            resolve(examineeTest);
+                        }).catch(function(res){resolve(res)});
+                    }).catch(function(res){resolve(res)})
+                }).catch(function(res){resolve(res)});      
+            }).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function setExaminerToTestRoom(token, testId, roomId, examinerId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                test = test.content;
+                var limitDate = new Date(test.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                if(!exists(test.rooms, roomId)){resolve({code:msg.ROOM_NOT_SET}); return;}
+                if(!exists(test.examiners, examinerId)){resolve({code:msg.EXAMINER_NOT_SET}); return;}
+                TestExaminer.update(testId, examinerId, null, roomId).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            }).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function setExamineeToTestRoom(token, testId, examineeId, roomId, seat){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                test = test.content;
+                var limitDate = new Date(test.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                if(!exists(test.rooms, roomId)){resolve({code:msg.ROOM_NOT_SET}); return;}
+                if(!exists(test.examinees, examineeId)){resolve({code:msg.EXAMINEE_NOT_SET}); return;}
+                TestExaminee.update(testId, examineeId, null, roomId, seat, null, null, null).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            });
+        });
+    });
+}
+
+function confirmPresence(token, testId, examineeId){
+    return new Promise(function(resolve, reject){
+        utils.isExaminee(token).then(function(isExaminee){
+            if(!isExaminee){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            var currentDate = new Date();
+            Test.get(testId).then(function(test){
+                test = test.content;
+                var limitDate = new Date(test.limitDate);
+                if(currentDate-limitDate > 0){resolve({code:msg.NO_LONGER_AVAILABLE}); return;}
+                TestExaminee.update(testId, examineeId, null, null, null, true, null, null);
+            }).catch(function(res){resolve(res)});
+        });
+    });
+}
+
+function exists(list, id){
+    var exist = false;
+    list.forEach(function(item){
+        if(item._id == id){
+            exist=true;
+        }
+    });
+    return exist;
+}
+
+function checkIn(token, examinerId, examineeId, sheetNumber ){
+    return new Promise(function(resolve, reject){
+        utils.isExaminer(token).then(function(isExaminer){
+            if(!isExaminer){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            TestExaminee.update(testId, examineeId, null, null, null, null, sheetNumber, examinerId+"."+examineeId+"."+sheetNumber)
+                        .then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+        });
+    });
+}
+
 module.exports = {
     login,
     logout,
@@ -284,5 +427,11 @@ module.exports = {
     updateExamineeRecord,
     deleteRoom,
     deleteSubject,
-
+    addRoomToTest,
+    addExamineeToTest,
+    addExaminerToTest,
+    setExaminerToTestRoom,
+    setExamineeToTestRoom,
+    confirmPresence,
+    checkIn
 }
