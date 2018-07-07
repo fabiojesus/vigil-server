@@ -79,18 +79,17 @@ function tests(token){
 function room(token, id){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-            Room.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
-        });
-    });
-}
-
-function roomNotAdmin(token, id){
-    return new Promise(function(resolve){
-        utils.isExaminer(token).then(function(isExaminer){
-            utils.isExaminee(token).then(function(isExaminer){
-                if(!(isExaminer || isExaminee)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-                Room.get(id).then(function(res){res.content.records=null;resolve(res)}).catch(function(res){resolve(res)});
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    Room.get(id).then(function(res){
+                        if(isExaminee || isExaminer)
+                            res.content.records = [];
+                        if(!(isExaminee || isExaminer || isAdmin)){
+                            resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;
+                        }
+                        resolve(res);
+                    }).catch(function(res){resolve(res)});
+                });
             });
         });
     });
@@ -104,8 +103,18 @@ function roomNotAdmin(token, id){
 function subject(token, id){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-            subject.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    Subject.get(id).then(function(res){
+                        if(isExaminee || isExaminer)
+                            res.content.records = [];
+                        if(!(isExaminee || isExaminer || isAdmin)){
+                            resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;
+                        }
+                        resolve(res);
+                    }).catch(function(res){resolve(res)});
+                });
+            });
         });
     });
 }
@@ -118,9 +127,17 @@ function subject(token, id){
 function examiner(token, id){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            utils.isExaminer(token).then(function(isExaminer){
-                if(!(isAdmin || isExaminer)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-                Examiner.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    Examiner.get(id).then(function(res){
+                        if(isExaminee || isExaminer)
+                            res.content.records = [];
+                        if(!(isExaminee || isExaminer || isAdmin)){
+                            resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;
+                        }
+                        resolve(res);
+                    }).catch(function(res){resolve(res)});
+                });
             });
         });
     });
@@ -135,8 +152,16 @@ function examinee(token, id){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
             utils.isExaminee(token).then(function(isExaminee){
-                if(!(isAdmin || isExaminee)){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-                Examinee.get(id).then(function(res){resolve(res)}).catch(function(res){resolve(res)});
+                utils.isExaminer(token).then(function(isExaminer){
+                    Examinee.get(id).then(function(res){
+                        if(isExaminee || isExaminer)
+                            res.content.records = [];
+                        if(!(isExaminee || isExaminer || isAdmin)){
+                            resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;
+                        }
+                        resolve(res);
+                    }).catch(function(res){resolve(res)});
+                });
             });
         });
     });

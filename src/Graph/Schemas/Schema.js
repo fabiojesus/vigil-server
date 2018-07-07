@@ -196,13 +196,24 @@ function schema(){
         type Mutation{
             login(email:String! password:String!):LoginResult
             logout(token:String!):LogoutResult
-            registerCurrentRoomRecord(token:String! id:String!):IDResult
-            registerCurrentSubjectRecord(token:String! id:String!):IDResult
-            registerRoom(token:String! name:String seats:Int):IDResult
-            registerSubject(token:String! name:String field:String):IDResult
+            registerRoom(token:String! name:String! seats:Int!):IDResult
+            registerSubject(token:String! name:String! field:String!):IDResult
             registerExaminee(token:String! name:String! identification:String! email:String! course:String! studentNumber:String!):IDResult
             registerExaminer(token:String! name:String! identification:String! email:String!):IDResult
             registerTest(token:String!  dateStart:String! dateEnd:String! dateLimit:String! subjectId:String! type:String!):IDResult
+            renewExamineeRecord(token:String! id:String!):IDResult
+            registerCurrentRoomRecord(token:String! id:String!):IDResult
+            registerCurrentSubjectRecord(token:String! id:String!):IDResult
+            registerCurrentExaminerRecord(token:String! id:String!):IDResult
+            registerCurrentExamineeRecord(token:String! id:String! course:String! studentNumber:String!):IDResult
+            renewExamineeRecord(token:String! id:String!):IDResult
+            updateRoom(token:String! id:String! name:String seats:Int):IDResult
+            updateSubject(token:String! id:String! name:String field:String):IDResult
+            updateExaminer(token:String! id:String! name:String identification:String):IDResult
+            updateExaminee(token:String! id:String! name:String identification:String):IDResult
+            updateExaminerRecord(token:String! id:String! recordId:String! course:String studentNumber:String):IDResult
+            deleteRoom(token:String! id:String!):IDResult
+            deleteSubject(token:String! id:String!):IDResult
         }
     `);
 }

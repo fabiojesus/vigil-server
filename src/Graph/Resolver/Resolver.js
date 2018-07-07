@@ -16,17 +16,22 @@ function resolvers(){
         logout:(args) => {return Mutations.logout(args.token)},
         registerRoom: (args) => {return Mutations.registerRoom(args.token, args.name, args.seats)}, 
         registerSubject: (args) => {return Mutations.registerSubject(args.token, args.name, args.field)},
-        registerTest: (args) => {return Mutations.registerTest(args.token, args.dateStart, args.dateEnd, args.dateLimit, args.subjectId, args.type)},
         registerExaminee: (args) => {return Mutations.registerExaminee(args.token, args.name, args.identification, args.email)},
         registerExaminer: (args) => {return Mutations.registerExaminer(args.token, args.name, args.identification, args.email, args.course, args.studentNumber)},
+        registerTest: (args) => {return Mutations.registerTest(args.token, args.dateStart, args.dateEnd, args.dateLimit, args.subjectId, args.type)},
         registerCurrentRoomRecord: (args)=>{return Mutations.registerCurrentRoomRecord(args.token, args.id)},
-        registerCurrentSubjectRecord: (args)=>{return Mutations.registerCurrentSubjectRecord(args.token, args.id)}
-        /*
+        registerCurrentSubjectRecord: (args)=>{return Mutations.registerCurrentSubjectRecord(args.token, args.id)},
+        registerCurrentExamineeRecord: (args)=>{return Mutations.registerCurrentExamineeRecord(args.token, args.id, args.course, args.studentNumber)},
+        registerCurrentExaminerRecord: (args)=>{return Mutations.registerCurrentExaminerRecord(args.token, args.id)},
+        renewExamineeRecord: (args)=> {return Mutations.renewExamineeRecord(args.token, args.id)},
         updateRoom: (args) => {return Actions.updateRoom(args.token, args.id, args.name, args.seats)},
-        toggleRoom: (args) => {return Actions.toggleRoom(args.token, args.id)},
-        registerCurrentRoomRecord: (args) => {return Actions.registerCurrentRoomRecord(args.token, args.id)},
         updateSubject: (args) => {return Actions.updateSubject(args.token, args.id, args.name, args.field)},
-        toggleSubject: (args) => {return Actions.toggleSubject(args.token, args.id)},     
+        updateExaminer: (args) => {return Actions.updateExaminer(args.token, args.id, args.identification, args.name)},
+        updateExaminee: (args) => {return Actions.updateExaminee(args.token, args.id, args.identification, args.name)},
+        updateExaminerRecord: (args) => {return Actions.updateExamineeRecord(args.token, args.id, args.recordId, args.course, args.studentNumber)},
+        deleteRoom: (args) => {return Actions.deleteRoom(args.token, args.id)},
+        deleteSubject: (args) => {return Actions.deleteSubject(args.token, args.is)}
+        /*
         registerCurrentSubjectRecord: (args) => {return Actions.registerCurrentSubjectRecord(args)},
         addRoomToTest: (args) => {return Actions.addRoomToTest(args.testId, args.roomId)},
         addExaminerToTest: (args) => {return Actions.addExaminerToTest(args.testId, args.examinerId)},

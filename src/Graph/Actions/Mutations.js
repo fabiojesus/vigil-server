@@ -31,7 +31,6 @@ function logout(token){
     });
 }
 
-
 function registerRoom(token, name, seats){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
@@ -142,10 +141,8 @@ function registerTest(token, dateStart, dateEnd, dateLimit, subjectId, type){
 function registerRoomRecord(token, roomId, year){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                 RoomRecord.create(roomId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            RoomRecord.create(roomId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
         });
     });
 }
@@ -157,10 +154,8 @@ function registerCurrentRoomRecord(token, roomId){
 function registerExaminerRecord(token, examinerId, year){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                 ExaminerRecord.create(examinerId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            ExaminerRecord.create(examinerId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
         });
     });
 }
@@ -172,10 +167,8 @@ function registerCurrentExaminerRecord(token, examinerId){
 function registerExamineeRecord(token, examinerId, year, course, studentNumber){
     return new Promise(function(resolve){
         utils.isAdmin(token).then(function(isAdmin){
-            if(!isAdmin)resolve({code:msg.NOT_ENOUGH_PERMISSIONS});
-            else{
-                 ExamineeRecord.create(examinerId, year, course, studentNumber).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
-            }
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            ExamineeRecord.create(examinerId, year, course, studentNumber).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
         });
     });
 }
@@ -185,22 +178,88 @@ function registerCurrentExamineeRecord(token, examineeId, course, studentNumber)
 }
 
 function renewExamineeRecord(token, examineeId){
-    //TODO
+    return new Promise(function(resolve, reject){
+        Examinee.get(examineeId).then(function(examinee){
+            if(!examinee.content){resolve(examinee);return;}
+            examinee = examinee.content;
+            var lastRecord = examinee.records[examinee.records.length-1];
+            console.log(lastRecord);
+        }).catch(function(res){resolve(res)});
+    })
 }
-
-
 
 function registerSubjectRecord(token, subjectId, year){
     return new Promise(function(resolve, reject){
-        if(!utils.isAdmin(token)) resolve({code:NOT_ENOUGH_PERMISSIONS});
-        else{
-            SubjectRecord.create(subjectId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
-        }   
+        if(!utils.isAdmin(token)) {resolve({code:NOT_ENOUGH_PERMISSIONS}); return;}
+        SubjectRecord.create(subjectId, year).then(function(res){resolve(res);}).catch(function(res){resolve(res);});
     });
 }
 
 function registerCurrentSubjectRecord(token, subjectId){
     return registerSubjectRecord(token, subjectId, utils.getCurrentYear());
+}
+
+function updateExaminee(token, examineeId, identification, name){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Examinee.update(examineeId, identification, name).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function updateExaminer(token, examinerId, identification, name){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Examiner.update(examinerId, identification, name).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function updateRoom(token, examinerId, name, seats){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Room.update(examinerId, name, seats).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function updateSubject(token, examinerId, name, field){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Subject.update(examinerId, name, field).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function updateExamineeRecord(token, examineeId, recordId, course, studentNumber){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            ExamineeRecord.update(examineeId, recordId, null, course, studentNumber).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function deleteRoom(token, roomId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Room.erase(roomId).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
+}
+
+function deleteSubject(token, subjectId){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            if(!isAdmin){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
+            Subject.erase(subjectId).then(function(res){resolve(res);}).catch(function(res){resolve(res)})
+        });
+    });
 }
 
 module.exports = {
@@ -213,8 +272,15 @@ module.exports = {
     registerTest,
     registerCurrentRoomRecord,
     registerCurrentSubjectRecord,
-    registerCurrentExaminerRecord,
     registerCurrentExamineeRecord,
-
+    registerCurrentExaminerRecord,
+    renewExamineeRecord,
+    updateRoom,
+    updateSubject,
+    updateExaminer,
+    updateExaminee,
+    updateExamineeRecord,
+    deleteRoom,
+    deleteSubject,
 
 }
