@@ -1,7 +1,7 @@
 function  connection(){
   const mongoose = require("mongoose");
-  const URL = "mongodb://localhost/vigil-alpha";
-  //const URL = "mongodb://admin:admin1234@ds125211.mlab.com:25211/heroku_l2kpggqn";
+  //const URL = "mongodb://localhost/vigil-alpha";
+  const URL = "mongodb://admin:admin1234@ds125211.mlab.com:25211/heroku_l2kpggqn";
 
 
   //Connect to mongodb
