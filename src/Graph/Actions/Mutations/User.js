@@ -22,7 +22,7 @@ function checkIn(token, testId, examinerId, examineeId, sheetNumber ){
     return new Promise(function(resolve, reject){
         utils.isExaminer(token).then(function(isExaminer){
             if(!isExaminer){resolve({code:msg.NOT_ENOUGH_PERMISSIONS}); return;}
-            TestExaminee.update(testId, examineeId, null, null, null, null, sheetNumber, examinerId+"."+examineeId+"."+sheetNumber+"."+new Date()+"")
+            TestExaminee.update(testId, examineeId, null, null, null, null, sheetNumber, testId+"."+examinerId+"."+examineeId+"."+sheetNumber+"."+new Date()+"")
                         .then(function(res){resolve(res)}).catch(function(res){resolve(res)});
         });
     });
