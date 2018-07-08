@@ -14,6 +14,7 @@ function create(examineeId, year, course, studentNumber){
                 return utils.isTheSame(currentItem, {year:year, studentNumber:studentNumber, isDeleted:false});
             });
             if(itemsLikeIt.length > 0) {reject({code:msg.EXAMINEE_RECORD_EXISTS}); return;}
+            console.log(year+"   "+course+"  "+studentNumber)
             var newRecord = new Record({year, course, studentNumber, isDeleted:false});
             examinee.records.push(newRecord);
             examinee.save(function(){resolve({code:msg.EXAMINEE_RECORD_REGISTER, content:newRecord._id})});
@@ -57,13 +58,13 @@ function update(examineeId, recordId, year, course, studentNumber){
     });
 }
 
-function erase(id){
+function erase(id, recordId){
     return new Promise(function(resolve, reject){
         Examinee.findById(id).then(function(examinee){
             if(!examinee){reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}
             var record = examinee.records.id(recordId);
             if(!record) {reject({code: msg.EXAMINEE_RECORD_NOT_EXIST});return;}
-            if(!isEmpty(record.tests)){reject({code:msg.EXAMINEE_RECORD_HAS_TESTS}); return;}
+            if(!utils.isEmpty(record.tests)){reject({code:msg.EXAMINEE_RECORD_HAS_TESTS}); return;}
             record.isDeleted = true;
             examinee.save(function(){resolve({code:msg.EXAMINEE_RECORD_DELETED, content:record._id})});    
         }).catch(function(res){reject(res)})

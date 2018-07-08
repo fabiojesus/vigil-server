@@ -49,7 +49,7 @@ function erase(id){
     return new Promise(function(resolve, reject){
         Room.findById(id).then(function(room){
             if(!room) {reject({code:msg.ROOM_NOT_EXISTS}); return;}
-            if(!utils.isEmpty(examinee.records)){reject({code:msg.ROOM_HAS_RECORDS}); return;}
+            if(!utils.isEmpty(room.records)){reject({code:msg.ROOM_HAS_RECORDS}); return;}
             room.isDeleted = true;
             room.save(function(){resolve({code:msg.ROOM_DELETED, content:room._id})})
         }).catch(function(res){reject(res)})

@@ -51,13 +51,14 @@ function update(subjectId, recordId, year){
     });
 }
 
-function erase(id){
+function erase(id, recordId){
     return new Promise(function(resolve, reject){
         Subject.findById(id).then(function(subject){
             if(!subject) {reject({code:msg.SUBJECT_NOT_EXISTS}); return;}
+            console.log(recordId);
             var record = subject.records.id(recordId);
             if(!record) {reject({code: msg.SUBJECT_RECORD_NOT_EXIST}); return;}
-            if(!isEmpty(record.tests)){reject({code:msg.SUBJECT_RECORD_HAS_TESTS}); return;}
+            if(!utils.isEmpty(record.tests)){reject({code:msg.SUBJECT_RECORD_HAS_TESTS}); return;}
             record.isDeleted = true;
             subject.save(function(){resolve({code:msg.SUBJECT_RECORD_DELETED, content:record._id})});
         }).catch(function(res){reject(res)})

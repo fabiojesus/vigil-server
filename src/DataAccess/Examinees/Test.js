@@ -59,7 +59,7 @@ function update(examineeId, recordId, testId, newTestId){
     });
 }
 
-function erase(id){
+function erase(id, recordId, testId){
     return new Promise(function(resolve, reject){
         Examinee.findById(id).then(function(examinee){
             if(!examinee) {reject({code:msg.EXAMINEE_NOT_EXISTS}); return;}

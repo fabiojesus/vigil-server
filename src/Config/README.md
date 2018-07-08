@@ -14,4 +14,14 @@ A set of Self-Explanatory messages that can be translated to a four digit code c
 * **Fourth Digit** - the action/error (Examinee does not exist or already exists, etc...)
 
 ### Roles.js
-A set of roles that an account can assume
+A set of roles that an account can assume:
+* **0** - Administrator
+* **1** - Examinee
+* **2** - Examiner
+
+### Test Type
+A set of test types
+* **0** - Exam
+* **1** - Second exam
+* **2** - Test
+* **3** - Finalist's exam

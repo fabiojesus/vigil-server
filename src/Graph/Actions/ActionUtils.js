@@ -5,7 +5,7 @@ const Account = require('../../DataAccess/Accounts/Account');
 const msg = require('../../Config/messages');
 const roles = require('../../Config/roles');
 
-function sendEmail(email, content){
+function sendEmail(email, subjectText, content){
     var nodemailer = require('nodemailer');
     var transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -18,7 +18,7 @@ function sendEmail(email, content){
     var mailOptions = {
         from: 'vigilsmartteam@gmail.com',
         to: email,
-        subject: 'Welcome to Vigil',
+        subject: subjectText,
         text: content
       };
       
@@ -40,12 +40,23 @@ function sendNewAccountEmail(email, password){
                   "   Username: "+email+"\n"+   
                   "   Password: "+password+"\n\n"+
                   "Best regards,\n The Vigil Team";
-    sendEmail(email, content)
+    sendEmail(email, "Welcome to Vigil", content)
 }
 
-function sendNewAccountPassword(email, password){
-    var content ="Hi there "+email+",\nYour new password is"+password+"\nBest regards,\n The Vigil Team";
-    sendEmail(email, content);
+function sendRecoveryEmail(email, password){
+    var content = "Hi there.\n\n"+
+                  "It seems you lost your password:\n"+
+                  "The new one is "+password+"\n\n"+
+                  "Best regards,\n The Vigil Team";
+    sendEmail(email, "Password Recovery", content)
+}
+
+function sendPasswordChangeEmail(email, password){
+    var content = "Hi there.\n\n"+
+                  "It seems you changed your password:\n"+
+                  "The new one is "+password+"\n\n"+
+                  "Best regards,\n The Vigil Team";
+    sendEmail(email, "Password Change", content)
 }
 
 function getCurrentYear(){
@@ -64,7 +75,7 @@ async function isAdmin(token){
         Token.search(token).then(function(tokenItem){
             var decoded = decode(token);
             resolve(tokenItem && decoded.role==roles.ADMINISTRATOR);
-        });
+        }).catch({code:msg.TOKEN_NOT_EXISTS});
     });
 }
 
@@ -72,8 +83,8 @@ async function isExaminer(token){
     return new Promise(function(resolve, reject){
         Token.search(token).then(function(tokenItem){
             var decoded = decode(token);
-            resolve(token && decoded.role == roles.EXAMINER)
-        });
+            resolve(tokenItem && decoded.role == roles.EXAMINER)
+        }).catch({code:msg.TOKEN_NOT_EXISTS});
     });
 }
 
@@ -81,8 +92,8 @@ async function isExaminee(token){
     return new Promise(function(resolve, reject){
         Token.search(token).then(function(tokenItem){
             var decoded = decode(token);
-            resolve(token && decoded.role == roles.EXAMINEE)
-        });
+            resolve(tokenItem && decoded.role == roles.EXAMINEE)
+        }).catch({code:msg.TOKEN_NOT_EXISTS});
     });
 }
 
@@ -104,14 +115,26 @@ function validateAccount(email, password){
     });
 }
 
+function exists(list, key, id){
+    var exist = false;
+    list.forEach(function(item){
+        if(item[key].toString() == id){
+            exist=true;
+        }
+    });
+    return exist;
+}
+
 module.exports ={
     sendNewAccountEmail,
+    sendPasswordChangeEmail,
+    sendRecoveryEmail,
     generateRandomPassword,
-    sendNewAccountPassword,
     getCurrentYear,
     isAdmin,
     isExaminee,
     isExaminer,
     createToken,
-    validateAccount
+    validateAccount,
+    exists
 }   

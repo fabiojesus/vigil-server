@@ -48,7 +48,7 @@ function erase(id){
     return new Promise(function(resolve, reject){
         Subject.findById(id).then(function(subject){
             if(!subject) {reject({code:msg.SUBJECT_NOT_EXISTS}); return;}
-            if(!utils.isEmpty(examinee.records)){reject({code:msg.SUBJECT_HAS_RECORDS}); return;}
+            if(!utils.isEmpty(subject.records)){reject({code:msg.SUBJECT_HAS_RECORDS}); return;}
             subject.isDeleted = true;
             subject.save(function(){resolve({code:msg.SUBJECT_DELETED, content:subject._id})});
         }).catch(function(res){reject(res)})

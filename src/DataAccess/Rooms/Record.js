@@ -51,13 +51,13 @@ function update(roomId, recordId, year){
     });
 }
 
-function erase(id){
+function erase(id, recordId){
     return new Promise(function(resolve, reject){
         Room.findById(id).then(function(room){
             if(!room) {reject({code:msg.ROOM_NOT_EXISTS}); return;}
             var record = room.records.id(recordId);
             if(!record) {reject({code: msg.ROOM_RECORD_NOT_EXIST}); return;}
-            if(!isEmpty(record.tests)){reject({code:msg.ROOM_RECORD_HAS_TESTS}); return;}
+            if(!utils.isEmpty(record.tests)){reject({code:msg.ROOM_RECORD_HAS_TESTS}); return;}
             record.isDeleted = true;
             room.save(function(){resolve({code:msg.ROOM_RECORD_DELETED, content:record._id})})
         }).catch(function(res){reject(res)})

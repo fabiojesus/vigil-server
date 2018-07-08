@@ -40,7 +40,8 @@ function update(testId, examinerId, newExaminerId, roomId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
             if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
-            var examiner = test.examiners.id(examinerId);
+            var examiner = test.examiners.filter(function(examiner){return(examiner.examinerId == examinerId)});
+            examiner = examiner[0];
             if(!examiner) {reject({code: msg.TEST_EXAMINER_NOT_EXISTS}); return;}
             if(newExaminerId) examiner.examinerId = newExaminerId;
             if(roomId) examiner.roomId = roomId;

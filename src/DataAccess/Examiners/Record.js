@@ -51,13 +51,13 @@ function update(examinerId, recordId, year){
     });
 }
 
-function erase(id){
+function erase(id, recordId){
     return new Promise(function(resolve, reject){
         Examiner.findById(id).then(function(examiner){
             if(!examiner) {reject({code:msg.EXAMINER_NOT_EXISTS}); return;}
             var record = examiner.records.id(recordId);
             if(!record) {reject({code: msg.EXAMINER_RECORD_NOT_EXIST}); return;}
-            if(!isEmpty(record.tests)){reject({code:msg.EXAMINER_RECORD_HAS_TESTS}); return;}
+            if(!utils.isEmpty(record.tests)){reject({code:msg.EXAMINER_RECORD_HAS_TESTS}); return;}
             record.isDeleted = true;
             examiner.save(function(){resolve({code:msg.EXAMINER_RECORD_DELETED, content:record._id})});
         }).catch(function(res){reject(res)})

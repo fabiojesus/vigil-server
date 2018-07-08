@@ -181,43 +181,61 @@ function schema(){
         }
  
         type Query{
-            subjects(token:String!): SubjectsResult
             rooms(token:String!): RoomsResult
-            tests(token:String!): TestsResult
-            examinees(token:String!):ExamineesResult
-            examiners(token:String!): ExaminersResult
-            subject(token:String! id:String!): SubjectResult
             room(token:String! id:String!):RoomResult
-            test(token:String! id:String!): TestResult
+            subjects(token:String!): SubjectsResult
+            subject(token:String! id:String!): SubjectResult
+            examinees(token:String!):ExamineesResult
             examinee(token:String! id:String!):ExamineeResult
+            examiners(token:String!): ExaminersResult
             examiner(token:String! id:String!):ExaminerResult
+            tests(token:String!): TestsResult
+            test(token:String! id:String!):TestResult
         }
 
         type Mutation{
             login(email:String! password:String!):LoginResult
             logout(token:String!):LogoutResult
+            recover(email:String!):IDResult
+            clear(token:String!):IDResult
+            changePassword(token:String! email:String! password:String!):IDResult
+            
             registerRoom(token:String! name:String! seats:Int!):IDResult
-            registerSubject(token:String! name:String! field:String!):IDResult
-            registerExaminee(token:String! name:String! identification:String! email:String! course:String! studentNumber:String!):IDResult
-            registerExaminer(token:String! name:String! identification:String! email:String!):IDResult
-            registerTest(token:String!  dateStart:String! dateEnd:String! dateLimit:String! subjectId:String! type:String!):IDResult
-            renewExamineeRecord(token:String! id:String!):IDResult
-            registerCurrentRoomRecord(token:String! id:String!):IDResult
-            registerCurrentSubjectRecord(token:String! id:String!):IDResult
-            registerCurrentExaminerRecord(token:String! id:String!):IDResult
-            registerCurrentExamineeRecord(token:String! id:String! course:String! studentNumber:String!):IDResult
             updateRoom(token:String! id:String! name:String seats:Int):IDResult
-            updateSubject(token:String! id:String! name:String field:String):IDResult
-            updateExaminer(token:String! id:String! name:String identification:String):IDResult
-            updateExaminee(token:String! id:String! name:String identification:String):IDResult
-            updateExaminerRecord(token:String! id:String! recordId:String! course:String studentNumber:String):IDResult
             deleteRoom(token:String! id:String!):IDResult
+            registerCurrentRoomRecord(token:String! id:String!):IDResult
+            deleteRoomRecord(token:String! id:String! recordId:String!):IDResult            
+            
+            registerSubject(token:String! name:String! field:String!):IDResult
+            updateSubject(token:String! id:String! name:String field:String):IDResult
             deleteSubject(token:String! id:String!):IDResult
+            registerCurrentSubjectRecord(token:String! id:String!):IDResult
+            deleteSubjectRecord(token:String! id:String! recordId:String!):IDResult            
+            
+            registerExaminee(token:String! name:String! identification:String! email:String! course:String! studentNumber:String!):IDResult
+            updateExaminee(token:String! id:String! name:String identification:String):IDResult
+            deleteExaminee(token:String! id:String!):IDResult
+            registerCurrentExamineeRecord(token:String! id:String! course:String! studentNumber:String!):IDResult
+            renewExamineeRecord(token:String! id:String!):IDResult
+            updateExamineeRecord(token:String! id:String! recordId:String! course:String studentNumber:String):IDResult
+            deleteExamineeRecord(token:String! id:String! recordId:String!):IDResult            
+
+            registerExaminer(token:String! name:String! identification:String! email:String!):IDResult
+            updateExaminer(token:String! id:String! name:String identification:String):IDResult
+            deleteExaminer(token:String! id:String!):IDResult
+            registerCurrentExaminerRecord(token:String! id:String!):IDResult
+            deleteExaminerRecord(token:String! id:String! recordId:String!):IDResult            
+            
+            registerTest(token:String!  dateStart:String! dateEnd:String! dateLimit:String! subjectId:String! type:String!):IDResult
             addRoomToTest(token:String! id:String! roomId:String!):IDResult
+            addExaminerToTest(token:String! id:String! examinerId:String!):IDResult
+            addExamineeToTest(token:String! id:String! examineeId:String!):IDResult
             setExaminerToTestRoom(token:String! id:String! roomId:String! examinerId:String!):IDResult
             setExamineeToTestRoom(token:String! id:String! examineeId:String! roomId:String! seat:Int):IDResult
+            
             confirmPresence(token:String! id:String! examineeId:String!):IDResult
-            checkIn(token:String! id:String! examineeId:String! sheetNumber:String!):IDResult
+            checkIn(token:String! id:String! examinerId:String! examineeId:String! sheetNumber:String!):IDResult
+        
         }
     `);
 }

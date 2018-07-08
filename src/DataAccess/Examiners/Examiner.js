@@ -48,7 +48,7 @@ function erase(id){
     return new Promise(function(resolve, reject){
         Examiner.findById(id).then(function(examiner){
             if(!examiner) {reject({code:msg.EXAMINER_NOT_EXISTS}); return;}
-            if(!utils.isEmpty(examinee.records)){reject({code:msg.EXAMINER_HAS_RECORDS}); return;}
+            if(!utils.isEmpty(examiner.records)){reject({code:msg.EXAMINER_HAS_RECORDS}); return;}
             examiner.isDeleted = true;
             examiner.save(function(){resolve({code:msg.EXAMINER_DELETED, content:examiner._id})});
         }).catch(function(res){reject(res)})

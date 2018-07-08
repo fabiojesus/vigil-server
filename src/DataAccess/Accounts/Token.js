@@ -56,8 +56,14 @@ function search(tokenValue){
  */
 function list(){
     return new Promise(function(resolve){
-        Token.find({}).then(function(result){resolve({code: msg.TOKENS_FETCH, content:result});})
+        Token.find({}).then(function(result){resolve({code: msg.TOKENS_FETCH, content:result});}).catch(function(res){reject(res)});
     });
 }
 
-module.exports = {create, get, erase, search, list};
+function eraseAll(){
+    return new Promise(function(resolve,reject){
+        Token.deleteMany({}).then(function(res){resolve(res)}).catch(function(res){reject(res)});
+    })
+}
+
+module.exports = {create, get, erase, search, list, eraseAll};
