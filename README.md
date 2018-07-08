@@ -4,7 +4,7 @@ Welcome to vigil, your smart test vigilance system.
 Vigil is a web server application created for the Internet Information Systems subject for the master's degree on Software Engineering.
 
 ## Hosting
-![alt text](https://cdn.worldvectorlogo.com/logos/heroku.svg "Heroku Logo")
+![alt text](./heroku-card.png "Heroku Logo")
 In order to allow external users to access the application, it was hosted on Heroku, a Platform-as-service that allows quick deployment through github, dropbox and their own git client. It has a debug trail that allows the developer to follow errors on the application and allows the user to add several plugins related to database, security and account management. For further information check [Heroku](https://www.heroku.com/)
 
 ## Database
