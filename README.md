@@ -13,10 +13,13 @@ In order to allow external users to access the application, it was hosted on Her
 Vigil uses a MongoDB database with the Mongoose's help to set the collections on objects as seen on the [data README](./src/Data/README.md)
 
 ### MongoDB
+![alt text](./mongodb-card.png "MongoDB Logo")
 MongoDB is a NoSQL database that uses collections instead of the usual tabular relationships. This means that it is possible to naturally stack elements inside others. Compass was used to create and manipulate a local database during development. For further information check [MongoDB](https://www.mongodb.com/)
 
 ### Mongoose
+![alt text](./mongoose-card.png "Mongoose Logo")
 Mongoose is a set of boilerplate functions that allow validation, casting and business logic on MongoDB collections. One of the main issues with mongoose implementation was the lack of functions to manage subcollections making mongoose almost useless. There was a need to create several functions to manage records and tests inside the main collections.
 
 ### Hosting
+![alt text](./mlab-card.png "mLab Logo")
 To host the database we used mLab, a database-as-a-service that provided us with a free sandbox licence through heroku. As a paid service, mLab displays increased security, backup and recovery, and monitoring tools. Some of these exist on the free version along with a document management application. For further information check [MLab](https://mlab.com/)
