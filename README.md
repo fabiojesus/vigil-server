@@ -1,5 +1,5 @@
 # VIGIL
-![alt text](./logo-card.png "MongoDB Logo")
+![alt text](./logo_card.png "Vigil Logo")
 Welcome to vigil, your smart test vigilance system.
 Vigil is a web server application created for the Internet Information Systems subject for the master's degree on Software Engineering.
 
