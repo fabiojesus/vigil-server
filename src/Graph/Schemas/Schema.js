@@ -238,7 +238,7 @@ function schema(){
             
             confirmPresence(token:String! id:String! examineeId:String!):IDResult
             checkIn(token:String! id:String! examinerId:String! examineeId:String! sheetNumber:String!):IDResult
-        
+            getExamineeFull(examineeId:String!):IDResult
         }
     `);
 }

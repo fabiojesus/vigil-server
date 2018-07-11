@@ -4,6 +4,10 @@ const Examinee = require('../../../DataAccess/Examinees/Examinee');
 const ExamineeRecord = require('../../../DataAccess/Examinees/Record');
 const Account = require("../../../DataAccess/Accounts/Account");
 const roles = require('../../../Config/roles');
+const Subject = require('../../../DataAccess/Subjects/Subject');
+const Room = require('../../../DataAccess/Rooms/Room');
+const Test = require('../../../DataAccess/Tests/Test');
+
 
 function registerExaminee(token, name, identification, email, course, studentNumber){
     return new Promise(function(resolve, reject){
@@ -93,11 +97,52 @@ function deleteExamineeRecord(token, examineeId, examineeRecordId){
     });
 }
 
+function getFull(id){
+    return new Promise(function(resolve, reject){
+        Subject.list().catch(res => reject(res)).then(function(subjects){
+            subjects = subjects.content;
+            Test.list().catch(res => reject(res)).then(function(tests){
+                tests = tests.content;
+                Room.list().catch(res => reject(res)).then(function(rooms){
+                    rooms = rooms.content;
+                    Examinee.get(id).catch(res => reject(res)).then(function(examinee){
+                        examinee = examinee.content;
+                        for(var i = 0; i< examinee.records.length; i++){
+                            for(var j = 0; j< examinee.records[i].tests.length; j++){
+                                let testData = tests.filter(function(temp){return examinee.records[i].tests[j].testId == temp._id})[0];
+                                let testDataExaminee = null;
+                                testData.examinees.forEach(function(examineeData){
+                                    if(examineeData.examineeId == id){
+                                        testDataExaminee = examineeData;
+                                    }
+                                });
+                                var subject = subjects.filter(function(temp){return testData.subjectId == temp._id}); 
+                                examinee.records[i].tests[j] = {
+                                    confirmationDate:testData.confirmationDate,
+                                    dateStart: testData.dateStart,
+                                    dateEnd: testData.dateEnd,
+                                    subject: subject[0].name,
+                                    type: testData.type,
+                                    isDeleted: testData.isDeleted,
+                                    room:testDataExamineeDao.room,
+                                    seat:testDataExamineeDao.seat,
+                                    sheetNumber:testDataExamineeDao.sheetNumber
+                                };
+                            }
+                        }
+                    resolve({code:3, content:JSON.stringify(examinee)});
+                    });
+                });
+            });
+        });
+    });
+}
 
 module.exports = {
     registerExaminee,
     updateExaminee,
     deleteExaminee,
+    getFull,
     registerCurrentExamineeRecord,
     renewExamineeRecord,
     updateExamineeRecord,

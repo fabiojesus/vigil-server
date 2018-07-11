@@ -53,7 +53,7 @@ function resolvers(){
         addExamineeToTest: (args) => {return Mutations.test.addExamineeToTest(args.token, args.id, args.examineeId)},
         setExaminerToTestRoom: (args) => {return Mutations.test.setExaminerToTestRoom(args.token, args.id, args.roomId, args.examinerId)},
         setExamineeToTestRoom: (args) => {return Mutations.test.setExamineeToTestRoom(args.token, args.id, args.examineeId, args.roomId, args.seat)},
-
+        getExamineeFull: (args) => {return Mutations.examinee.getFull(args.examineeId)},
         confirmPresence: (args) => {return Mutations.user.confirmPresence(args.token, args.id, args.examineeId)},
         checkIn: (args) => {return Mutations.user.checkIn(args.token, args.id, args.examinerId, args.examineeId, args.sheetNumber)}
     }
