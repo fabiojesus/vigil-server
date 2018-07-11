@@ -124,9 +124,9 @@ function getFull(id){
                                     subject: subject[0].name,
                                     type: testData.type,
                                     isDeleted: testData.isDeleted,
-                                    room:testDataExamineeDao.room,
-                                    seat:testDataExamineeDao.seat,
-                                    sheetNumber:testDataExamineeDao.sheetNumber
+                                    room:testDataExaminee.room,
+                                    seat:testDataExaminee.seat,
+                                    sheetNumber:testDataExaminee.sheetNumber
                                 };
                             }
                         }
