@@ -19,6 +19,7 @@ function schema(){
         }
 
         type RecordTest{
+            id:String!
             testId: String!
             active: Boolean
         }
@@ -137,6 +138,7 @@ function schema(){
         }
         
         type TestExaminee{
+            id:String!
             active:Boolean
             examineeId: String
             roomId: String
@@ -158,6 +160,7 @@ function schema(){
         }
 
         type Test{
+            id:String!
             year: String
             confirmationDate:String
             dateStart: String
