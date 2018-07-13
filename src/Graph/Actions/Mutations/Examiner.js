@@ -67,10 +67,58 @@ function deleteExaminerRecord(token, examinerId, examinerRecordId){
     });
 }
 
+
+function getFull(token, id){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    if(!isAdmin && !isExaminee && !isExaminer){reject({code: msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                    Subject.list().catch(res => reject(res)).then(function(subjects){
+                        subjects = subjects.content;
+                        Test.list().catch(res => reject(res)).then(function(tests){
+                            tests = tests.content;
+                            Room.list().catch(res => reject(res)).then(function(rooms){
+                                rooms = rooms.content;
+                                Examiner.get(id).catch(res => reject(res)).then(function(examiner){
+                                    examiner = examiner.content;
+                                    for(var i = 0; i< examiner.records.length; i++){
+                                        for(var j = 0; j< examiner.records[i].tests.length; j++){
+                                            let testData = tests.filter(function(temp){return examiner.records[i].tests[j].testId == temp._id})[0];
+                                            let testDataExaminer = null;
+                                            testData.examiners.forEach(function(examinerData){
+                                                if(examinerData.examinerId == id){
+                                                    testDataExaminer = examinerData;
+                                                }
+                                            });
+                                            var subject = subjects.filter(function(temp){return testData.subjectId == temp._id}); 
+                                            examiner.records[i].tests[j] = {
+                                                confirmationDate:testData.confirmationDate,
+                                                dateStart: testData.dateStart,
+                                                dateEnd: testData.dateEnd,
+                                                subject: subject[0].name,
+                                                type: testData.type,
+                                                isDeleted: testData.isDeleted,
+                                                room:testDataExaminer.room,
+                                            };
+                                        }
+                                    }
+                                resolve({code:msg.EXAMINER_FETCH, content:JSON.stringify(examiner)});
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
 module.exports = {
     registerExaminer,
     updateExaminer,
     deleteExaminer,
     registerCurrentExaminerRecord,
+    getFull,
     deleteExaminerRecord
 }

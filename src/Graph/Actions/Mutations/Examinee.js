@@ -97,40 +97,47 @@ function deleteExamineeRecord(token, examineeId, examineeRecordId){
     });
 }
 
-function getFull(id){
+function getFull(token, id){
     return new Promise(function(resolve, reject){
-        Subject.list().catch(res => reject(res)).then(function(subjects){
-            subjects = subjects.content;
-            Test.list().catch(res => reject(res)).then(function(tests){
-                tests = tests.content;
-                Room.list().catch(res => reject(res)).then(function(rooms){
-                    rooms = rooms.content;
-                    Examinee.get(id).catch(res => reject(res)).then(function(examinee){
-                        examinee = examinee.content;
-                        for(var i = 0; i< examinee.records.length; i++){
-                            for(var j = 0; j< examinee.records[i].tests.length; j++){
-                                let testData = tests.filter(function(temp){return examinee.records[i].tests[j].testId == temp._id})[0];
-                                let testDataExaminee = null;
-                                testData.examinees.forEach(function(examineeData){
-                                    if(examineeData.examineeId == id){
-                                        testDataExaminee = examineeData;
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    if(!isAdmin && !isExaminee && !isExaminer){reject({code: msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                    Subject.list().catch(res => reject(res)).then(function(subjects){
+                        subjects = subjects.content;
+                        Test.list().catch(res => reject(res)).then(function(tests){
+                            tests = tests.content;
+                            Room.list().catch(res => reject(res)).then(function(rooms){
+                                rooms = rooms.content;
+                                Examinee.get(id).catch(res => reject(res)).then(function(examinee){
+                                    examinee = examinee.content;
+                                    for(var i = 0; i< examinee.records.length; i++){
+                                        for(var j = 0; j< examinee.records[i].tests.length; j++){
+                                            let testData = tests.filter(function(temp){return examinee.records[i].tests[j].testId == temp._id})[0];
+                                            let testDataExaminee = null;
+                                            testData.examinees.forEach(function(examineeData){
+                                                if(examineeData.examineeId == id){
+                                                    testDataExaminee = examineeData;
+                                                }
+                                            });
+                                            var subject = subjects.filter(function(temp){return testData.subjectId == temp._id}); 
+                                            examinee.records[i].tests[j] = {
+                                                confirmationDate:testData.confirmationDate,
+                                                dateStart: testData.dateStart,
+                                                dateEnd: testData.dateEnd,
+                                                subject: subject[0].name,
+                                                type: testData.type,
+                                                isDeleted: testData.isDeleted,
+                                                room:testDataExaminee.room,
+                                                seat:testDataExaminee.seat,
+                                                sheetNumber:testDataExaminee.sheetNumber
+                                            };
+                                        }
                                     }
+                                resolve({code:3, content:JSON.stringify(examinee)});
                                 });
-                                var subject = subjects.filter(function(temp){return testData.subjectId == temp._id}); 
-                                examinee.records[i].tests[j] = {
-                                    confirmationDate:testData.confirmationDate,
-                                    dateStart: testData.dateStart,
-                                    dateEnd: testData.dateEnd,
-                                    subject: subject[0].name,
-                                    type: testData.type,
-                                    isDeleted: testData.isDeleted,
-                                    room:testDataExaminee.room,
-                                    seat:testDataExaminee.seat,
-                                    sheetNumber:testDataExaminee.sheetNumber
-                                };
-                            }
-                        }
-                    resolve({code:3, content:JSON.stringify(examinee)});
+                            });
+                        });
                     });
                 });
             });

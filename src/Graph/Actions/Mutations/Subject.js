@@ -29,6 +29,41 @@ function updateSubject(token, examinerId, name, field){
     });
 }
 
+function getFull(token, id){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    if(!isAdmin && !isExaminee && !isExaminer){reject({code: msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                    Subject.list().catch(res => reject(res)).then(function(subjects){
+                        subjects = subjects.content;
+                        Test.list().catch(res => reject(res)).then(function(tests){
+                            tests = tests.content;
+                            Subject.get(id).catch(res => reject(res)).then(function(subject){
+                                subject = subject.content;
+                                for(var i = 0; i< subject.records.length; i++){
+                                    for(var j = 0; j< subject.records[i].tests.length; j++){
+                                        let testData = tests.filter(function(temp){return subject.records[i].tests[j].testId == temp._id})[0];
+                                        subject.records[i].tests[j] = {
+                                            confirmationDate:testData.confirmationDate,
+                                            dateStart: testData.dateStart,
+                                            dateEnd: testData.dateEnd,
+                                            type: testData.type,
+                                            isDeleted: testData.isDeleted,
+                                        };
+                                    }
+                                }
+                            resolve({code:msg.EXAMINER_FETCH, content:JSON.stringify(examiner)});
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
+
 function deleteSubject(token, subjectId){
     return new Promise(function(resolve, reject){
         utils.isAdmin(token).then(function(isAdmin){
@@ -63,5 +98,6 @@ module.exports = {
     updateSubject,
     deleteSubject,
     registerCurrentSubjectRecord,
-    deleteSubjectRecord
+    deleteSubjectRecord,
+    getFull
 }

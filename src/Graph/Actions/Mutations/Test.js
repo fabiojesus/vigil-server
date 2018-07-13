@@ -8,7 +8,7 @@ const Examinee = require('../../../DataAccess/Examinees/Examinee');
 const ExamineeTest = require('../../../DataAccess/Examinees/Test');
 const Room = require('../../../DataAccess/Rooms/Room');
 const RoomTest = require('../../../DataAccess/Rooms/Test');
-
+const Subject = require('../../../DataAccess/Subjects/Subject');
 
 const utils = require('../ActionUtils');
 const msg = require('../../../Config/messages');
@@ -105,6 +105,84 @@ function addExamineeToTest(token, testId, examineeId){
     });
 }
 
+function getFull(token, id){
+    return new Promise(function(resolve, reject){
+        utils.isAdmin(token).then(function(isAdmin){
+            utils.isExaminee(token).then(function(isExaminee){
+                utils.isExaminer(token).then(function(isExaminer){
+                    if(!isAdmin && !isExaminee && !isExaminer){reject({code: msg.NOT_ENOUGH_PERMISSIONS}); return;}
+                    Subject.list().catch(res => reject(res)).then(function(subjects){
+                        subjects = subjects.content;
+                        Examinee.list().catch(res => reject(res)).then(function(examinees){
+                            examinees = examinees.content;
+                            Examiner.list().catch(res => reject(res)).then(function(examiners){
+                                examiners = examiners.content;
+                                Room.list().catch(res => reject(res)).then(function(rooms){
+                                    rooms = rooms.content;
+                                    Test.get(id).catch(res => reject(res)).then(function(test){
+                                        test = test.content;
+                                        var subject = subjects.filter(function(temp){return test.subjectId == temp._id})[0]; 
+                                        var examineeList = [];
+                                        var examinerList = [];
+                                        var roomList = [];
+                                        for(var i = 0; i < test.examinees.length; i++){
+                                            var examineeData = test.examinees[i];
+                                            var examinee = examinees.filter(function(temp){return examineeData.examineeId == temp._id})[0]; 
+                                            var examineeRoom = rooms.filter(function(temp){return examineeData.roomId == temp._id});
+                                            console.log(examineeRoom);
+                                            examineeList.push({
+                                                name:examinee.name,
+                                                identification:examinee.identification,
+                                                room: examineeRoom.name,
+                                                seat: examineeData.seat,
+                                                registered: examineeData.registered,
+                                                sheetNumber: examineeData.sheetNumber,
+                                                presence: examineeData.presence
+                                            });
+                                        }
+
+                                        for(var i = 0; i < test.examiners.length; i++){
+                                            var examinerData = test.examiners[i];
+                                            var examiner = examiners.filter(function(temp){return examinerData.examinerId == temp._id})[0]; 
+                                            var examinerRoom = rooms.filter(function(temp){return examinerData.roomId == temp._id});
+                                            console.log(examinerRoom);
+                                            examinerList.push({
+                                                name:examiner.name,
+                                                identification:examiner.identification,
+                                                room: examinerRoom.name,
+                                            });
+                                        }
+
+                                        for(var i = 0; i < test.rooms.length; i++){
+                                            var roomData = test.rooms[i];
+                                            var room = rooms.filter(function(temp){return roomData.roomId == temp._id}); 
+                                            roomList.push({
+                                                name:room.name,
+                                            });
+                                        }
+
+                                        resolve({code:msg.TEST_FETCH, 
+                                                 content:JSON.stringify({
+                                                     rooms:roomList,
+                                                     examiners:examinerList,
+                                                     examinees:examineeList,
+                                                     confirmationDate:test.confirmationDate,
+                                                     dateStart: test.dateStart,
+                                                     dateEnd: test.dateEnd,
+                                                     subject: subject.name,
+                                                     type: test.type,
+                                                 })});
+                                    });
+                                });
+                            });
+                        })
+                    });
+                });
+            });
+        });
+    });
+}
+
 function setExaminerToTestRoom(token, testId, roomId, examinerId){
     return new Promise(function(resolve, reject){
         utils.isAdmin(token).then(function(isAdmin){
@@ -158,6 +236,7 @@ module.exports = {
     registerTest,
     addRoomToTest,
     addExaminerToTest,
+    getFull,
     addExamineeToTest,
     setExaminerToTestRoom,
     setExamineeToTestRoom

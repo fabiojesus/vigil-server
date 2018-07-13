@@ -238,7 +238,11 @@ function schema(){
             
             confirmPresence(token:String! id:String! examineeId:String!):IDResult
             checkIn(token:String! id:String! examinerId:String! examineeId:String! sheetNumber:String!):IDResult
-            getExamineeFull(examineeId:String!):IDResult
+            getExamineeFull(token:String! examineeId:String!):IDResult
+            getExaminerFull(token:String! examinerId:String!):IDResult
+            getTestFull(token:String! testId:String!):IDResult
+            getSubjectFull(token:String! subjectId:String!):IDResult
+            getRoomFull(token:String! roomId:String!):IDResult
         }
     `);
 }
