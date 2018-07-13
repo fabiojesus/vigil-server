@@ -26,7 +26,7 @@ function get(testId, examineeId){
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
             if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
-            var examinee = test.examinees.id(examineeId);
+            var examinee = test.examinees.filter(function(examineeRecord){return examineeRecord.examineeId == examineeId});
             if(!examinee) {reject({code: msg.TEST_EXAMINEE_NOT_EXISTS}); return;}
             resolve({code:msg.TEST_EXAMINEE_FETCH, content:examinee});
         });
