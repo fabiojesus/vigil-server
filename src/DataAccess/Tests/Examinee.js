@@ -37,11 +37,17 @@ function get(testId, examineeId){
  *  Updates an test's examinee returning a {code, content} result
  */
 function update(testId, examineeId, newExamineeId, roomId, seat, registered, sheetNumber, presence){
+    console.log(sheetNumber);
+    console.log(presence);
     return new Promise(function(resolve, reject){
         Test.findById(testId).then(function(test){
             if(!test){reject({code:msg.TEST_NOT_EXISTS}); return;}
-            var examinee = test.examinees.filter(function(examinee){return(examinee.examineeId == examineeId)});
-            examinee = examinee[0];
+            var examinee = null;
+            for(var i = 0; i < test.examinees.length; i++){
+                if(test.examinees[i].examineeId == examineeId){
+                    examinee = test.examinees[i];
+                }
+            }
             if(!examinee) {reject({code: msg.TEST_EXAMINEE_NOT_EXISTS}); return;}
             if(newExamineeId) examinee.examineeId = newExamineeId;
             if(roomId) examinee.roomId = roomId;
@@ -52,6 +58,7 @@ function update(testId, examineeId, newExamineeId, roomId, seat, registered, she
             var itemsLikeIt = test.examinees.filter(function(currentItem){ return utils.isTheSame(currentItem, {examineeId:examinee.examineeId, isDeleted:false});});
             itemsLikeIt= utils.removeSelf(itemsLikeIt, examinee);
             if(itemsLikeIt.length >0) {reject({code:msg.TEST_EXAMINEE_EXISTS}); return;}
+            console.log(examinee);
             test.save(function(){resolve({code:msg.TEST_EXAMINEE_UPDATED, content:examinee._id})})
         });
     });
