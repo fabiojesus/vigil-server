@@ -2,6 +2,7 @@ const utils = require('../ActionUtils');
 const msg = require('../../../Config/messages');
 const Subject = require('../../../DataAccess/Subjects/Subject');
 const SubjectRecord = require('../../../DataAccess/Subjects/Record');
+const Test = require('../../../DataAccess/Tests/Test');
 
 function registerSubject(token, name, field){
     return new Promise(function(resolve){
@@ -53,7 +54,8 @@ function getFull(token, id){
                                         };
                                     }
                                 }
-                            resolve({code:msg.EXAMINER_FETCH, content:JSON.stringify(examiner)});
+                                console.log(subject);
+                            resolve({code:msg.EXAMINER_FETCH, content:JSON.stringify(subject)});
                             });
                         });
                     });

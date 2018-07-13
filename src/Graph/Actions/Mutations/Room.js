@@ -2,6 +2,8 @@ const Room = require('../../../DataAccess/Rooms/Room');
 const RoomRecord = require('../../../DataAccess/Rooms/Record');
 const utils = require('../ActionUtils');
 const msg = require('../../../Config/messages');
+const Subject = require('../../../DataAccess/Subjects/Subject');
+const Test = require('../../../DataAccess/Tests/Test');
 
 function registerRoom(token, name, seats){
     return new Promise(function(resolve){
@@ -86,7 +88,7 @@ function getFull(token, id){
                                         };
                                     }
                                 }
-                            resolve({code:msg.EXAMINER_FETCH, content:JSON.stringify(examiner)});
+                            resolve({code:msg.ROOM_FETCH, content:JSON.stringify(room)});
                             });
                         });
                     });

@@ -54,9 +54,9 @@ function resolvers(){
         setExaminerToTestRoom: (args) => {return Mutations.test.setExaminerToTestRoom(args.token, args.id, args.roomId, args.examinerId)},
         setExamineeToTestRoom: (args) => {return Mutations.test.setExamineeToTestRoom(args.token, args.id, args.examineeId, args.roomId, args.seat)},
         getExamineeFull: (args) => {return Mutations.examinee.getFull(args.token, args.examineeId)},
-        getTestFull: (args) => {return Mutations.test.getFull(args.token, args.testId)},
         getExaminerFull: (args) => {return Mutations.examiner.getFull(args.token, args.examinerId)},
-        getSubjectFull: (args) => {return Mutations.subject.getFull(args.token, args.subjetId)},
+        getSubjectFull: (args) => {return Mutations.subject.getFull(args.token, args.subjectId)},
+        getTestFull: (args) => {return Mutations.test.getFull(args.token, args.testId)},
         getRoomFull: (args) => {return Mutations.room.getFull(args.token, args.roomId)},
 
         confirmPresence: (args) => {return Mutations.user.confirmPresence(args.token, args.id, args.examineeId)},

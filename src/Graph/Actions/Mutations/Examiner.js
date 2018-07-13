@@ -4,6 +4,9 @@ const Examiner = require('../../../DataAccess/Examiners/Examiner');
 const ExaminerRecord = require('../../../DataAccess/Examiners/Record');
 const Account = require("../../../DataAccess/Accounts/Account");
 const roles = require('../../../Config/roles');
+const Subject = require('../../../DataAccess/Subjects/Subject');
+const Room = require('../../../DataAccess/Rooms/Room');
+const Test = require('../../../DataAccess/Tests/Test');
 
 function registerExaminer(token, name, identification, email){
     return new Promise(function(resolve, reject){
