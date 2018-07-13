@@ -31,10 +31,11 @@ function checkIn(token, testId, examinerId, examineeId, sheetNumber ){
 function askQuestion(question){
     return new Promise(function(resolve, reject){
         var answer;
+        console.log(question);
         if(question == "what's the meaning of life?") answer = 42;
         if(question == "give me some sweet numbers") answer = "4, 8, 15, 16, 23 ,42";
         if(question == "what doth life?") answer = "What doth life? Are we just fleshy blips in some meaningless stew of cosmic oblivion? Or is it vice-reversa? Is our every trollop through fate's garden infused with a mystic..."
-        resolve({code:000, answer});
+        resolve({code:000, content:answer});
     });
 }
 
