@@ -30,7 +30,7 @@ function checkIn(token, testId, examinerId, examineeId, sheetNumber ){
 
 function askQuestion(question){
     return new Promise(function(resolve, reject){
-        var answer;
+        var answer = "The answer to that question is either confidential or you are not ready to receive the answer yet";
         console.log(question);
         if(question == "what's the meaning of life?") answer = 42;
         if(question == "give me some sweet numbers") answer = "4, 8, 15, 16, 23 ,42";
