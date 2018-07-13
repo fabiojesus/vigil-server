@@ -243,6 +243,7 @@ function schema(){
             getTestFull(token:String! testId:String!):IDResult
             getSubjectFull(token:String! subjectId:String!):IDResult
             getRoomFull(token:String! roomId:String!):IDResult
+            askQuestion(question:String!):IDResult
         }
     `);
 }

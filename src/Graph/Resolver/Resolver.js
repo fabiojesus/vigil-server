@@ -60,7 +60,8 @@ function resolvers(){
         getRoomFull: (args) => {return Mutations.room.getFull(args.token, args.roomId)},
 
         confirmPresence: (args) => {return Mutations.user.confirmPresence(args.token, args.id, args.examineeId)},
-        checkIn: (args) => {return Mutations.user.checkIn(args.token, args.id, args.examinerId, args.examineeId, args.sheetNumber)}
+        checkIn: (args) => {return Mutations.user.checkIn(args.token, args.id, args.examinerId, args.examineeId, args.sheetNumber)},
+        askQuestion: (args) =>{return Mutations.user.askQuestion(args.question)}
     }
 }
 
