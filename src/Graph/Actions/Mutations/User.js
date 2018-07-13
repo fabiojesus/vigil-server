@@ -38,4 +38,4 @@ function askQuestion(question){
     });
 }
 
-module.exports = {confirmPresence, checkIn}
+module.exports = {confirmPresence, checkIn, askQuestion}
